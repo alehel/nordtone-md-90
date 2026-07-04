@@ -1,25 +1,39 @@
-# CODING AGENTS: READ THIS FIRST
+# NORDTONE MD-90
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+**Turn your own music library into a complete, DJ-hosted radio show — fitted precisely to a cassette, with a print-ready J-card.**
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+Point it at your music folder, describe a vibe ("80s synth-pop, upbeat, a little melancholy"), pick a tape length (C60/C90/C120), and the MD-90 produces two audio files — one per side — hosted by an AI presenter with real radio craft: consistent loudness, crossfades, and the DJ talking over song intros with the music ducked underneath.
 
-## What you should do — IMPORTANT
+**Your files · your keys · your tape.** Everything runs locally. Bring your own LLM (Anthropic, OpenAI, Gemini, Groq, Ollama, or any OpenAI-compatible endpoint) and optionally an ElevenLabs voice; a free local voice works offline.
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for the full plan and [`design/`](design/) for the original Claude Design handoff.
 
-**Read `project/NORDTONE MD-90.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Status
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+**Phase 0–1** (of 7): Tauri scaffold + pixel-perfect static UI with mocked data.
+The full flow is clickable — Setup → Generation (mock composer) → J-card — plus Settings, all in the charcoal/amber "hardware" design. No real indexing, AI, TTS, or mixing yet.
 
-## About the design files
+## Development
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+Prerequisites: Node 20+, Rust stable, and on Linux the [Tauri system deps](https://tauri.app/start/prerequisites/) (`libwebkit2gtk-4.1-dev` etc.).
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+```sh
+npm install
+npm run dev          # frontend only, in a browser (window controls are no-ops)
+npm run tauri dev    # the real frameless desktop app
+npm run check        # svelte-check / typescript
+npm run build        # frontend production build
+npm run tauri build  # desktop bundles (packaging is finalized in Phase 7)
+```
 
-## Bundle contents
+## Layout
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `NORDTONE MD-90 Cassette Radio` project files (HTML prototypes, assets, components)
+```
+src/                  Svelte frontend
+  design-system/      tokens.css, themes/, components/
+  screens/            Setup · Generation · JCard · Settings
+  lib/                store.ts (state machine), ipc.ts, mock.ts
+src-tauri/            Rust core (Tauri 2)
+design/               Claude Design handoff (reference designs — read-only)
+scripts/              icon generator
+```
