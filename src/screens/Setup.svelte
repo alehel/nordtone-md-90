@@ -67,7 +67,7 @@
           {/each}
         </div>
         <div class="persona-well">
-          <input bind:value={$persona} spellcheck="false" aria-label="Host persona" />
+          <textarea bind:value={$persona} spellcheck="false" aria-label="Host persona"></textarea>
         </div>
         <div class="format-row">
           <div>
@@ -206,18 +206,20 @@
   }
   .persona-well {
     display: flex;
+    min-height: 100px;
     margin-top: 10px;
     background: var(--lcd-bg);
     border-radius: 6px;
     box-shadow: var(--lcd-shadow);
-    padding: 7px 12px;
+    padding: 9px 12px;
   }
-  .persona-well input {
+  .persona-well textarea {
     flex: 1;
     background: transparent;
     border: none;
     outline: none;
-    font: 17px var(--font-lcd);
+    resize: none;
+    font: 17px/1.45 var(--font-lcd);
     color: var(--lcd-fg);
     text-shadow: 0 0 8px var(--lcd-glow);
     caret-color: var(--lcd-fg);
