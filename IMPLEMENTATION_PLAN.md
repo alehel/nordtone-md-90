@@ -11,7 +11,7 @@ This plan translates the Claude Design handoff (`project/NORDTONE MD-90.html`, s
 | Decision | Choice | Rationale |
 |---|---|---|
 | **Desktop framework** | **Tauri 2** (Rust core + web UI) | Small binaries, native performance, and a Rust backend that is a natural fit for the heavy audio DSP/mixing work. The webview reproduces the skeuomorphic UI with full fidelity. |
-| **Color direction** | **Charcoal / amber** (design 1a–1c) | The committed primary. The full three-screen flow is already designed in it. Cream (1d) and cool-grey (1e) survive as documented alternate themes but are not built in v1. |
+| **Color direction** | **Charcoal / amber** (design 1a–1c) as the **default theme** | The committed primary — the full three-screen flow is designed in it. The two color studies, cream/orange (1d) and cool grey/blue (1e), ship as **built-in alternate themes** selectable in Settings (see §3.4). |
 | **Scope** | **Full app, phased** | UI shell → library indexing → AI selection/script → TTS → audio mix engine → J-card → polish/packaging, with an end-to-end MVP milestone mid-way. |
 | **AI provider** | **Vendor-agnostic** via the `genai` crate | The user picks their own LLM — Anthropic, OpenAI, Gemini, Groq, xAI, DeepSeek, or a local model via Ollama — plus any OpenAI-compatible endpoint. No provider is hard-wired. |
 | **Local-first** | Everything runs on the user's machine with their own API keys | "Your files, your keys, your tape." No backend server, no telemetry. Keys live in the OS keychain. |
@@ -46,7 +46,7 @@ The design must be recreated **pixel-perfectly**, not by copying the prototype's
 - `VT323` — all LCD / seven-segment style readouts (monospace)
 - All three fonts are **bundled locally** (self-hosted `.woff2`) so the app works fully offline.
 
-**Color palette (charcoal / amber)**
+**Color palette (charcoal / amber — the default theme's values for the semantic tokens in §3.4)**
 
 | Token | Value |
 |---|---|
@@ -101,7 +101,33 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S VIBE editor (LCD textarea + suggested genre chips), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
 2. **Generation** (`1b`) — PROGRAM SEQUENCE stage LEDs (Scan → Select → Write Script → Voice → Mix), SCRIPT MONITOR (streams the DJ script live), spinning CASSETTE BAY, TAPE COUNTER (`00:17:26 / 45:00` + progress bar), transport strip with animated VU + **STOP · CANCEL** and a "now fitting / duck / crossfade" status line.
 3. **J-card** (`1c`) — the unfolded inlay in a paper tray, OUTPUT list (`side-a.wav`, `side-b.wav`, `jcard.pdf`), **PRINT J-CARD / EXPORT PDF / REVEAL AUDIO FILES**, and a FIT REPORT (side slack, LUFS, ducking events).
-4. **Settings** (new — flagged in the transcript as the likely next screen) — **AI provider picker** (provider + model + API key, or Ollama/custom endpoint URL for local models) and ElevenLabs key, all secrets stored in the OS keychain; local voice model management; default tape length; output folder; loudness target. Styled to match (inset panels + LCD fields).
+4. **Settings** (new — flagged in the transcript as the likely next screen) — **AI provider picker** (provider + model + API key, or Ollama/custom endpoint URL for local models) and ElevenLabs key, all secrets stored in the OS keychain; local voice model management; default tape length; output folder; loudness target; **FACEPLATE theme selector** (§3.4). Styled to match (inset panels + LCD fields).
+
+### 3.4 Theming
+
+The app is themeable from day one. A theme is a complete "faceplate" for the hardware: every component consumes only **semantic design tokens** (CSS custom properties), and a theme is a file that assigns values to those tokens. No component ever references a raw color.
+
+**Mechanics**
+- Tokens are defined per-theme in `design-system/themes/*.css`, applied by setting `data-theme` on the document root; switching is instant (no reload) with a short cross-fade.
+- Token roles (superset of §3.1): `panel-face`, `panel-inset`, `lcd-bg`, `lcd-fg`, `lcd-fg-dim`, `lcd-glow`, `accent`, `accent-badge`, `metal-btn`, `btn-drop`, `btn-active-bg`, `btn-active-fg`, `rec-btn`, `rec-drop`, `led-ok`, `led-busy`, `led-off`, `text-hi`, `text-mut`, `wordmark`, `screw`, plus the signature shadow groups — light-face themes flip the inset/emboss shadow directions (dark text-shadows become light, `0 -1px` embossing becomes `0 1px`), so shadows are tokens too, not hard-coded.
+- Semantics stay stable across themes: `led-ok` is always green, `led-busy` always blinks warm, the VU meter keeps its cream paper face and red overload zone. What changes is the *hardware*: faceplate metal/plastic, LCD phosphor color, accent, and the REC button's color.
+- The selected theme persists in settings; an optional "follow OS appearance" mode maps light OS → the chosen light theme, dark OS → charcoal.
+- The **J-card** front panel accent line and highlight colors follow the active theme, so the printed inlay matches the tape's "hardware" (the paper/tracklist side stays print-black-on-cream in every theme).
+
+**Built-in themes** (values from the design source)
+
+| Token role | `charcoal` (default, 1a–1c) | `cream` (1d) | `grey` (1e) |
+|---|---|---|---|
+| Faceplate | `#45484e→#33353a→#2a2c30→#242629` | `#f4efe3→#e9e2d1→#ddd5c2` | `#e6e9ee→#d5dae1→#c4cad3` |
+| Wordmark | `#d8d4ca` (dark-embossed) | `#5c554a` (light-embossed) | `#4b5158` (light-embossed) |
+| Badge / accent | amber `#ffc36b→#f09a2e` | orange `#f07a2e→#d05a12` | signal blue `#3d7bf5→#2356c9` |
+| LCD | `#0e0b06→#1a130a`, text `#ffb14e` | `#171310→#241c14`, text `#ff9b4a` | `#0d1219→#141d2a`, text `#7fb2ff` |
+| Buttons | `#4c4f55→#33353a`, drop `#1a1b1e` | `#fbf7ee→#e4dcc9`, drop `#b8ae99` | `#f2f4f7→#d8dde4`, drop `#9aa2ad` |
+| Active key | `#3a3226→#2b2115`, text `#ffd9a0` | `#f4e3d2→#ecd2b8`, text `#d05a12` | `#dbe6fb→#c4d6f6`, text `#2356c9` |
+| REC button | red `#ff7a70→#c0392b→#8e2418` | orange `#ff9557→#e2621a→#a8430c` | blue `#6e9bff→#2b62d9→#183e96` |
+| Mood (from the design) | night-radio charcoal & amber | "quiet Scandinavian desk object — warm paper, bakelite, one orange accent" | "lab-instrument cool — Dieter Rams greys, ice-blue displays, clinical calm" |
+
+The 1d/1e studies only cover a subset of the UI, so building them as full themes means **extrapolating the missing token values in each study's spirit** (e.g. cream's inset panels, grey's paper tray); those extrapolations should be reviewed against the studies' mood lines above. Third-party/user themes are out of scope for v1, but the token architecture leaves the door open (a theme is just a CSS file).
 
 ---
 
@@ -111,7 +137,7 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 ┌──────────────────────────────────────────────────────────────┐
 │  Frontend  (Tauri webview)                                     │
 │  Svelte + TypeScript + Vite                                    │
-│  ├─ design-system/  (tokens.css, components)                   │
+│  ├─ design-system/  (tokens, themes/, components)              │
 │  ├─ screens/  Setup · Generation · JCard · Settings            │
 │  ├─ state store (app state machine)                            │
 │  └─ ipc.ts  (typed wrappers over invoke() + event listeners)   │
@@ -207,12 +233,12 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 
 ### Phase 0 — Scaffold & design foundation
 - Tauri 2 + Svelte + TS + Vite project; frameless window (`decorations: false`), custom `AppChrome` with working min/max/close + drag region.
-- Bundle the three fonts locally; port `tokens.css` and the keyframe animations.
+- Bundle the three fonts locally; establish the **semantic token + theme architecture** (§3.4) with the charcoal theme as the only theme yet, and port the keyframe animations.
 - CI: build + typecheck + `cargo clippy`/`fmt` on macOS/Windows/Linux.
 - **Demo:** empty charcoal window with real custom chrome and correct fonts/colors.
 
 ### Phase 1 — Static UI shell (the design, pixel-perfect)
-- Build every component in §3.2 and all four screens with **mocked data** and the design's animations (reels, VU wiggle, blinking cursors, stage LEDs).
+- Build every component in §3.2 and all four screens with **mocked data** and the design's animations (reels, VU wiggle, blinking cursors, stage LEDs). Components consume semantic tokens only — theme-readiness is enforced here, while only charcoal exists.
 - Screen navigation wired to the app state machine (fake transitions).
 - **Demo:** the full flow clickable end-to-end, visually indistinguishable from `MD-90 App.dc.html`. *(This alone satisfies the original "static hi-fi mockups" fidelity bar.)*
 
@@ -244,7 +270,8 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 - FIT REPORT populated from Phase 5 metrics.
 - **Demo:** print/export a correct J-card matching the finished tape.
 
-### Phase 7 — Polish, packaging, release
+### Phase 7 — Polish, theming, packaging, release
+- **Alternate themes**: build `cream` (1d) and `grey` (1e) as full themes per §3.4 (extrapolating the studies to full token coverage), add the FACEPLATE selector to Settings with instant switch, persistence, and optional follow-OS-appearance; theme the J-card accent.
 - Error/empty/edge states for every screen (no key, tiny library, generation failure, format unsupported, disk full).
 - Persistence of settings/last session; optional re-generate.
 - **Packaging & signing:** macOS `.dmg` (signed + **notarized**), Windows `.msi`/NSIS (signed), Linux AppImage + `.deb`. Auto-update via Tauri updater.
@@ -266,7 +293,7 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 
 - **Rust unit tests** for: fit-to-side solver (fixtures with known optimal packings), LUFS normalization (golden PCM), tag reading, keychain round-trip (mocked).
 - **Golden-audio tests**: fixed inputs → assert output duration ≤ side length, integrated loudness within ±0.5 LUFS of target, expected ducking-event count.
-- **Frontend component tests** (Vitest) + a visual-regression snapshot of each screen against the design.
+- **Frontend component tests** (Vitest) + visual-regression snapshots of each screen **per theme** (charcoal validated against 1a–1c; cream/grey against the 1d/1e studies where they overlap). A lint/test guard fails on raw color literals in components — everything must go through semantic tokens.
 - **E2E smoke** (Tauri driver / WebDriver): folder → compose → outputs exist, on each OS in CI.
 
 ## 10. Risks & mitigations
@@ -285,7 +312,7 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 ```
 /                     Tauri project root
 ├─ src/               Svelte frontend
-│  ├─ design-system/  tokens.css, components/*.svelte
+│  ├─ design-system/  tokens.css, themes/{charcoal,cream,grey}.css, components/*.svelte
 │  ├─ screens/        Setup, Generation, JCard, Settings
 │  ├─ lib/            store.ts (state machine), ipc.ts
 │  └─ assets/fonts/   VT323, Barlow, Barlow Condensed (.woff2)
