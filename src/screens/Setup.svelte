@@ -9,8 +9,19 @@
   import CassetteBay from '../design-system/components/CassetteBay.svelte';
   import TransportStrip from '../design-system/components/TransportStrip.svelte';
   import RoundButton from '../design-system/components/RoundButton.svelte';
-  import { vibe, tape, premiumVoice, startCompose, openSettings } from '../lib/store';
-  import { LIBRARY, DEFAULT_VIBE, VIBE_CHIPS, SHOW_TITLE, TAPES } from '../lib/mock';
+  import {
+    vibe,
+    tape,
+    premiumVoice,
+    hostPreset,
+    persona,
+    talkLevel,
+    eraNews,
+    applyHostPreset,
+    startCompose,
+    openSettings,
+  } from '../lib/store';
+  import { LIBRARY, DEFAULT_VIBE, VIBE_CHIPS, SHOW_TITLE, TAPES, HOST_PRESETS, TALK_LEVELS } from '../lib/mock';
 
   if (!$vibe) vibe.set(DEFAULT_VIBE);
   $: selected = TAPES.find((t) => t.id === $tape) ?? TAPES[1];
@@ -30,7 +41,7 @@
       </InsetPanel>
 
       <InsetPanel label="TONIGHT'S VIBE" grow>
-        <div slot="right" class="hint">DESCRIBE THE SHOW</div>
+        <div slot="right" class="hint">THE MUSIC — DESCRIBE THE SHOW</div>
         <div class="vibe-well">
           <textarea bind:value={$vibe} spellcheck="false" aria-label="Tonight's vibe"></textarea>
         </div>
@@ -38,6 +49,35 @@
           {#each VIBE_CHIPS as chip}
             <button class="chip" on:click={() => vibe.update((v) => (v ? v + ' · ' + chip : chip))}>{chip}</button>
           {/each}
+        </div>
+      </InsetPanel>
+
+      <InsetPanel label="SHOW FORMAT">
+        <div slot="right" class="hint">THE HOST — NO PROMPTING NEEDED</div>
+        <div class="field-label">HOST PERSONALITY</div>
+        <div class="presets">
+          {#each HOST_PRESETS as p}
+            <HardwareButton active={$hostPreset === p.id} on:click={() => applyHostPreset(p.id)}>
+              {p.label}
+            </HardwareButton>
+          {/each}
+        </div>
+        <div class="persona-well">
+          <input bind:value={$persona} spellcheck="false" aria-label="Host persona" />
+        </div>
+        <div class="format-row">
+          <div>
+            <div class="field-label">TALK AMOUNT</div>
+            <div class="talk">
+              {#each TALK_LEVELS as lvl}
+                <HardwareButton active={$talkLevel === lvl} on:click={() => talkLevel.set(lvl)}>{lvl}</HardwareButton>
+              {/each}
+            </div>
+          </div>
+          <div>
+            <div class="field-label">ERA NEWS</div>
+            <ToggleSwitch left="OFF" right="ON" bind:value={$eraNews} />
+          </div>
         </div>
       </InsetPanel>
     </div>
@@ -64,7 +104,7 @@
     </div>
   </div>
 
-  <TransportStrip vuMode="static">
+  <TransportStrip>
     <svelte:fragment slot="status">
       <Lcd size="lg">
         READY · {selected.id} · 2 × {selected.perSide} · EST. {selected.est} TRACKS + HOST LINKS<br />
@@ -114,7 +154,7 @@
   .vibe-well {
     flex: 1;
     display: flex;
-    min-height: 118px;
+    min-height: 112px;
     background: var(--lcd-bg);
     border-radius: 6px;
     box-shadow: var(--lcd-shadow);
@@ -144,6 +184,57 @@
     border-radius: 99px;
     padding: 2px 12px;
     cursor: pointer;
+  }
+  .field-label {
+    font: 600 10px var(--font-label);
+    letter-spacing: 2px;
+    color: var(--text-mut3);
+    margin-bottom: 6px;
+  }
+  .presets {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .presets :global(button) {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+  .persona-well {
+    display: flex;
+    margin-top: 10px;
+    background: var(--lcd-bg);
+    border-radius: 6px;
+    box-shadow: var(--lcd-shadow);
+    padding: 7px 12px;
+  }
+  .persona-well input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font: 17px var(--font-lcd);
+    color: var(--lcd-fg);
+    text-shadow: 0 0 8px var(--lcd-glow);
+    caret-color: var(--lcd-fg);
+  }
+  .format-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 12px;
+  }
+  .format-row > div:last-child {
+    padding-bottom: 2px;
+  }
+  .talk {
+    display: flex;
+    gap: 8px;
+  }
+  .talk :global(button) {
+    padding: 7px 10px;
+    font-size: 12px;
   }
   .pair {
     display: grid;

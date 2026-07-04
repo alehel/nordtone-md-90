@@ -57,50 +57,6 @@ input {
     transform: rotate(360deg);
   }
 }
-@keyframes vuwig1 {
-  0% {
-    transform: rotate(-34deg);
-  }
-  18% {
-    transform: rotate(8deg);
-  }
-  34% {
-    transform: rotate(-12deg);
-  }
-  52% {
-    transform: rotate(22deg);
-  }
-  70% {
-    transform: rotate(-4deg);
-  }
-  86% {
-    transform: rotate(14deg);
-  }
-  100% {
-    transform: rotate(-34deg);
-  }
-}
-@keyframes vuwig2 {
-  0% {
-    transform: rotate(-20deg);
-  }
-  22% {
-    transform: rotate(16deg);
-  }
-  40% {
-    transform: rotate(-28deg);
-  }
-  58% {
-    transform: rotate(6deg);
-  }
-  76% {
-    transform: rotate(26deg);
-  }
-  100% {
-    transform: rotate(-20deg);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

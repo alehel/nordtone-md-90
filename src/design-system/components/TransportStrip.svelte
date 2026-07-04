@@ -1,13 +1,4 @@
-<script lang="ts">
-  import VuMeter from './VuMeter.svelte';
-  export let vuMode: 'static' | 'anim' = 'static';
-</script>
-
 <div class="strip">
-  <div class="vus">
-    <VuMeter label="LEFT" mode={vuMode === 'anim' ? 'anim1' : 'static'} />
-    <VuMeter label="RIGHT" mode={vuMode === 'anim' ? 'anim2' : 'static'} />
-  </div>
   <div class="status"><slot name="status" /></div>
   <div class="action"><slot name="action" /></div>
 </div>
@@ -22,10 +13,6 @@
     background: var(--transport-bg);
     border-radius: 12px;
     box-shadow: var(--transport-shadow);
-  }
-  .vus {
-    display: flex;
-    gap: 14px;
   }
   .status {
     flex: 1;

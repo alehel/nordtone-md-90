@@ -56,7 +56,7 @@
     </div>
   </div>
 
-  <TransportStrip vuMode="anim">
+  <TransportStrip>
     <svelte:fragment slot="status">
       <Lcd size="lg">
         NOW FITTING: {$nowFitting}<br />

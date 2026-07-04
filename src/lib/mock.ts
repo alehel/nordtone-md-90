@@ -13,6 +13,18 @@ export const DEFAULT_VIBE =
 
 export const VIBE_CHIPS = ['synthwave', 'new wave', 'italo disco'];
 
+/** SHOW FORMAT presets (IMPLEMENTATION_PLAN §3.5) — one-press host personas. */
+export const HOST_PRESETS = [
+  { id: 'warm', label: 'WARM FM', persona: 'warm, unhurried — stories between songs' },
+  { id: 'hype', label: 'TOP-40 HYPE', persona: 'fast, bright — countdown energy' },
+  { id: 'wit', label: 'DRY WIT', persona: 'laconic, deadpan — one-liners' },
+  { id: 'jazz', label: 'MIDNIGHT JAZZ', persona: 'velvet, slow — after-hours' },
+] as const;
+export type HostPresetId = (typeof HOST_PRESETS)[number]['id'];
+
+export const TALK_LEVELS = ['MINIMAL', 'BALANCED', 'CHATTY'] as const;
+export type TalkLevel = (typeof TALK_LEVELS)[number];
+
 export const SHOW_TITLE = 'Neon Rain Drivetime';
 
 export const TAPES = [

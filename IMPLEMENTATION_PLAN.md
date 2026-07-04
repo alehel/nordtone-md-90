@@ -76,7 +76,6 @@ The design must be recreated **pixel-perfectly**, not by copying the prototype's
 - `ledblink` — busy/active LED pulse (1.4s)
 - `cursor` — blinking block cursor in LCD text (1.1s steps)
 - `reelspin` — cassette reels rotate (2–2.6s linear) while generating
-- `vuwig1` / `vuwig2` — the two VU needles wiggle independently (2.8s / 3.1s ease-in-out)
 
 ### 3.2 Reusable components (design system)
 
@@ -90,16 +89,16 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 - `SegmentedControl` — the C60/C90/C120 selector (lit = amber-inset with corner LED).
 - `ToggleSwitch` — LOCAL ↔ ELEVENLABS rocker.
 - `Led` — green (ok) / amber (busy, blinking) / off.
-- `VuMeter` — SVG analog VU (scale arc, red overload zone, needle). Static angle in Setup, animated in Generation, **level-driven in the real mix**.
 - `CassetteBay` — the cassette graphic: label header, title, reel window with two conic-gradient reels (spin when active), shell screws.
 - `StageList` — the PROGRESS SEQUENCE rows (LED + label + VT323 status) for the five generation stages.
-- `TransportStrip` — bottom bar: dual VU meters + status LCD + primary action button (REC / STOP / PRINT).
+- `TransportStrip` — bottom bar: status LCD + primary action button (REC / STOP / PRINT). *(The design's VU meters were dropped — see §3.5.)*
+- `ShowFormat` — the granular show-definition controls (§3.5): host-personality preset keys with a persona LCD readout, talk-amount selector, era-news toggle.
 - `JCard` — the unfolded, print-scaled inlay (front art panel, dashed fold + spine, two-column tracklist flap, credits). The mockup's credit line ("SCRIPT BY CLAUDE") is rendered dynamically from the configured provider/model — e.g. "SCRIPT BY GPT-4O" or "SCRIPT BY LLAMA 3 (LOCAL)".
 
 ### 3.3 Screens
 
-1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S VIBE editor (LCD textarea + suggested genre chips), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
-2. **Generation** (`1b`) — PROGRAM SEQUENCE stage LEDs (Scan → Select → Write Script → Voice → Mix), SCRIPT MONITOR (streams the DJ script live), spinning CASSETTE BAY, TAPE COUNTER (`00:17:26 / 45:00` + progress bar), transport strip with animated VU + **STOP · CANCEL** and a "now fitting / duck / crossfade" status line.
+1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S VIBE editor (LCD textarea + suggested genre chips), **SHOW FORMAT panel** (host-personality presets, talk amount, era news — §3.5), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
+2. **Generation** (`1b`) — PROGRAM SEQUENCE stage LEDs (Scan → Select → Write Script → Voice → Mix), SCRIPT MONITOR (streams the DJ script live), spinning CASSETTE BAY, TAPE COUNTER (`00:17:26 / 45:00` + progress bar), transport strip with **STOP · CANCEL** and a "now fitting / duck / crossfade" status line.
 3. **J-card** (`1c`) — the unfolded inlay in a paper tray, OUTPUT list (`side-a.wav`, `side-b.wav`, `jcard.pdf`), **PRINT J-CARD / EXPORT PDF / REVEAL AUDIO FILES**, and a FIT REPORT (side slack, LUFS, ducking events).
 4. **Settings** (new — flagged in the transcript as the likely next screen) — **AI provider picker** (provider + model + API key, or Ollama/custom endpoint URL for local models) and ElevenLabs key, all secrets stored in the OS keychain; local voice model management; default tape length; output folder; loudness target; **FACEPLATE theme selector** (§3.4). Styled to match (inset panels + LCD fields).
 
@@ -110,7 +109,7 @@ The app is themeable from day one. A theme is a complete "faceplate" for the har
 **Mechanics**
 - Tokens are defined per-theme in `design-system/themes/*.css`, applied by setting `data-theme` on the document root; switching is instant (no reload) with a short cross-fade.
 - Token roles (superset of §3.1): `panel-face`, `panel-inset`, `lcd-bg`, `lcd-fg`, `lcd-fg-dim`, `lcd-glow`, `accent`, `accent-badge`, `metal-btn`, `btn-drop`, `btn-active-bg`, `btn-active-fg`, `rec-btn`, `rec-drop`, `led-ok`, `led-busy`, `led-off`, `text-hi`, `text-mut`, `wordmark`, `screw`, plus the signature shadow groups — light-face themes flip the inset/emboss shadow directions (dark text-shadows become light, `0 -1px` embossing becomes `0 1px`), so shadows are tokens too, not hard-coded.
-- Semantics stay stable across themes: `led-ok` is always green, `led-busy` always blinks warm, the VU meter keeps its cream paper face and red overload zone. What changes is the *hardware*: faceplate metal/plastic, LCD phosphor color, accent, and the REC button's color.
+- Semantics stay stable across themes: `led-ok` is always green, `led-busy` always blinks warm, and paper goods (cassette label, J-card tracklist) stay print-cream. What changes is the *hardware*: faceplate metal/plastic, LCD phosphor color, accent, and the REC button's color.
 - The selected theme persists in settings; an optional "follow OS appearance" mode maps light OS → the chosen light theme, dark OS → charcoal.
 - The **J-card** front panel accent line and highlight colors follow the active theme, so the printed inlay matches the tape's "hardware" (the paper/tracklist side stays print-black-on-cream in every theme).
 
@@ -129,6 +128,20 @@ The app is themeable from day one. A theme is a complete "faceplate" for the har
 
 The 1d/1e studies only cover a subset of the UI, so building them as full themes means **extrapolating the missing token values in each study's spirit** (e.g. cream's inset panels, grey's paper tray); those extrapolations should be reviewed against the studies' mood lines above. Third-party/user themes are out of scope for v1, but the token architecture leaves the door open (a theme is just a CSS file).
 
+### 3.5 Deliberate deltas from the handoff design
+
+Two changes were decided after the handoff and supersede the mockups:
+
+**VU meters removed.** The design's analog VU meters were decorative — they never carried information the tape counter and progress bar don't already show. The transport strip is now status LCD + primary action button; the `vuwig` animations and `--vu-*` tokens are gone. (If a themed VU ever earns its place — e.g. true level metering during a Phase 5 preview-render — it can return as a component, but it is not planned.)
+
+**SHOW FORMAT panel added (Setup).** Free-text vibe alone assumes the user is comfortable prompting. A structured panel beside it gives non-prompters granular, discoverable controls that the app composes into the LLM prompts (§6):
+
+- **HOST PERSONALITY** — one-press preset keys, each mapping to a persona description shown on an LCD readout: e.g. *WARM FM* ("warm, unhurried, stories between songs"), *TOP-40 HYPE* ("fast, bright, countdown energy"), *DRY WIT* ("laconic, deadpan, one-liners"), *MIDNIGHT JAZZ* ("velvet, slow, after-hours"). Presets are starting points — the persona line remains editable text for users who want to go beyond them.
+- **TALK AMOUNT** — MINIMAL / BALANCED / CHATTY, controlling link frequency and length (and feeding the fit solver's time budget for speech).
+- **ERA NEWS** — on/off toggle for the "news items from the era of the music" segments.
+
+The vibe field stays for musical direction; the SHOW FORMAT panel shapes the *host and script*. Both are merged by the prompt builder, so a user can get a great show having typed nothing but a genre.
+
 ---
 
 ## 4. Architecture
@@ -143,7 +156,7 @@ The 1d/1e studies only cover a subset of the UI, so building them as full themes
 │  └─ ipc.ts  (typed wrappers over invoke() + event listeners)   │
 └───────────────▲───────────────────────────┬──────────────────┘
         Tauri events (progress,             │  invoke() commands
-        script tokens, VU levels)           ▼
+        script tokens, mix progress)        ▼
 ┌──────────────────────────────────────────────────────────────┐
 │  Core  (Rust)                                                  │
 │  ├─ library    scan folder, read tags/duration, feature probe │
@@ -167,7 +180,7 @@ The 1d/1e studies only cover a subset of the UI, so building them as full themes
 
 - **Svelte + TypeScript + Vite.** Chosen over React to keep the bundle small (matches Tauri's lightweight ethos) and because the UI is highly visual/stateful with little need for a large ecosystem. *(If the team strongly prefers React, it substitutes cleanly — the design-system + IPC layer is framework-neutral.)*
 - CSS design tokens as documented in §3.1; components as §3.2. No CSS framework — the look is bespoke.
-- SVG for VU meters and cassette reels (ported from the prototype's inline SVG).
+- SVG/CSS for the cassette reels (ported from the prototype).
 - A small **app state machine**: `Setup → Composing → Complete`, plus `error` and `cancelled`. Drives which screen renders and what the transport button does.
 
 ### 4.2 Backend stack (Rust crates)
@@ -200,7 +213,7 @@ This is the core technical risk and the piece that makes it "a show, not a playl
 5. **Crossfade** between tracks (design shows **~1.8 s** equal-power crossfades).
 6. **Fit to side**: total side runtime must be ≤ side length with minimal slack (design targets ~9–22 s slack). This is a **bin-packing / sequencing problem** — see §6.
 7. **Limit / true-peak guard**, then **encode** to `side-a.wav` / `side-b.wav` with `hound`.
-8. Emit **VU levels** and **elapsed time** as events during (or during a preview render of) the mix so the meters and tape counter reflect real signal.
+8. Emit **elapsed time / progress** events during the mix so the tape counter and progress bar reflect real render progress.
 
 **Fit report** (J-card screen) is a by-product: per-side slack, measured integrated loudness, and count of ducking events.
 
@@ -217,6 +230,8 @@ All LLM access goes through a single `ai` module built on the **`genai`** crate,
 - **Anything else:** a custom OpenAI-compatible base URL + key.
 
 The `ai` module owns provider/model config, key retrieval from the keychain, streaming, retries/backoff, and a **capability shim**: structured output is requested via native JSON mode where the provider supports it, and falls back to prompt-enforced JSON + parse-and-repair where it doesn't, so both calls below behave identically on every provider. A "test connection" action in Settings validates the chosen provider/model before composing.
+
+A **prompt builder** sits in front of both calls: it merges the free-text vibe with the structured SHOW FORMAT settings (§3.5 — host persona, talk amount, era news) into the system/user prompts, so casual users get well-formed prompts without writing them. Talk amount also sets the speech-time budget handed to the fit solver.
 
 Two distinct LLM calls, both using the user's configured provider:
 
@@ -238,7 +253,7 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 - **Demo:** empty charcoal window with real custom chrome and correct fonts/colors.
 
 ### Phase 1 — Static UI shell (the design, pixel-perfect)
-- Build every component in §3.2 and all four screens with **mocked data** and the design's animations (reels, VU wiggle, blinking cursors, stage LEDs). Components consume semantic tokens only — theme-readiness is enforced here, while only charcoal exists.
+- Build every component in §3.2 and all four screens with **mocked data** and the design's animations (reels, blinking cursors, stage LEDs), including the SHOW FORMAT panel (§3.5). Components consume semantic tokens only — theme-readiness is enforced here, while only charcoal exists.
 - Screen navigation wired to the app state machine (fake transitions).
 - **Demo:** the full flow clickable end-to-end, visually indistinguishable from `MD-90 App.dc.html`. *(This alone satisfies the original "static hi-fi mockups" fidelity bar.)*
 
@@ -261,7 +276,7 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 
 ### Phase 5 — Audio mix engine  ⟶ **MVP**
 - Implement §5 in stages: 5a decode+normalize+concat+WAV; 5b crossfades; 5c ducking; 5d fit-to-side solver.
-- Drive VU meters + tape counter from real signal/progress events; STOP cancels the job cleanly.
+- Drive the tape counter + progress bar from real render-progress events; STOP cancels the job cleanly.
 - Output `side-a.wav` / `side-b.wav`; compute fit-report metrics.
 - **Demo:** folder + vibe + C90 → two playable WAVs, each fitting a side, host ducked over intros. **This is the first fully working tape.**
 
@@ -275,7 +290,7 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 - Error/empty/edge states for every screen (no key, tiny library, generation failure, format unsupported, disk full).
 - Persistence of settings/last session; optional re-generate.
 - **Packaging & signing:** macOS `.dmg` (signed + **notarized**), Windows `.msi`/NSIS (signed), Linux AppImage + `.deb`. Auto-update via Tauri updater.
-- Accessibility pass (focus order, ARIA on the custom controls, reduced-motion honoring the reel/VU animations), performance pass (large libraries, mix throughput).
+- Accessibility pass (focus order, ARIA on the custom controls, reduced-motion honoring the reel animation), performance pass (large libraries, mix throughput).
 - **Demo:** installable, signed builds on all three platforms.
 
 ---

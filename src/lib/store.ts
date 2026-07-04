@@ -4,7 +4,7 @@
  * replaces the timers with real backend job events over Tauri IPC.
  */
 import { writable, derived, get } from 'svelte/store';
-import { SCRIPT_TEXT, NOW_FITTING, type TapeId } from './mock';
+import { SCRIPT_TEXT, NOW_FITTING, HOST_PRESETS, type TapeId, type HostPresetId, type TalkLevel } from './mock';
 
 export type Screen = 'setup' | 'generation' | 'jcard' | 'settings';
 
@@ -30,6 +30,19 @@ export function closeSettings(): void {
 export const vibe = writable<string>('');
 export const tape = writable<TapeId>('C90');
 export const premiumVoice = writable<boolean>(true);
+
+/* SHOW FORMAT (§3.5) — structured show-definition settings that the Phase 3
+   prompt builder merges with the free-text vibe. */
+export const hostPreset = writable<HostPresetId>('warm');
+/** Editable persona line; preset keys overwrite it, users can refine it. */
+export const persona = writable<string>(HOST_PRESETS[0].persona);
+export const talkLevel = writable<TalkLevel>('BALANCED');
+export const eraNews = writable<boolean>(true);
+
+export function applyHostPreset(id: HostPresetId): void {
+  hostPreset.set(id);
+  persona.set(HOST_PRESETS.find((p) => p.id === id)?.persona ?? '');
+}
 
 const IDLE_STAGES: Stage[] = [
   { label: 'SCAN LIBRARY', state: 'idle', status: '' },
