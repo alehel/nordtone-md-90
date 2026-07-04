@@ -12,7 +12,8 @@ This plan translates the Claude Design handoff (`project/NORDTONE MD-90.html`, s
 |---|---|---|
 | **Desktop framework** | **Tauri 2** (Rust core + web UI) | Small binaries, native performance, and a Rust backend that is a natural fit for the heavy audio DSP/mixing work. The webview reproduces the skeuomorphic UI with full fidelity. |
 | **Color direction** | **Charcoal / amber** (design 1a–1c) | The committed primary. The full three-screen flow is already designed in it. Cream (1d) and cool-grey (1e) survive as documented alternate themes but are not built in v1. |
-| **Scope** | **Full app, phased** | UI shell → library indexing → Claude selection/script → TTS → audio mix engine → J-card → polish/packaging, with an end-to-end MVP milestone mid-way. |
+| **Scope** | **Full app, phased** | UI shell → library indexing → AI selection/script → TTS → audio mix engine → J-card → polish/packaging, with an end-to-end MVP milestone mid-way. |
+| **AI provider** | **Vendor-agnostic** via the `genai` crate | The user picks their own LLM — Anthropic, OpenAI, Gemini, Groq, xAI, DeepSeek, or a local model via Ollama — plus any OpenAI-compatible endpoint. No provider is hard-wired. |
 | **Local-first** | Everything runs on the user's machine with their own API keys | "Your files, your keys, your tape." No backend server, no telemetry. Keys live in the OS keychain. |
 
 ---
@@ -24,8 +25,8 @@ This plan translates the Claude Design handoff (`project/NORDTONE MD-90.html`, s
 3. **Pick a tape length** — C60 / C90 / C120 (2 × 30 / 45 / 60 min sides).
 4. **Choose a host voice** — a free local voice by default, or a premium ElevenLabs voice.
 5. **Compose** (the red REC button):
-   - Claude **selects and sequences** tracks from the library to match the vibe and fit each side.
-   - Claude **writes a DJ script** — cold open, inter-song links with artist stories, era news items, a "flip the tape" reminder at the end of Side A, and a Side B sign-off.
+   - The user's chosen LLM **selects and sequences** tracks from the library to match the vibe and fit each side.
+   - The LLM **writes a DJ script** — cold open, inter-song links with artist stories, era news items, a "flip the tape" reminder at the end of Side A, and a Side B sign-off.
    - The script is **voiced** (local TTS or ElevenLabs).
    - Everything is **mixed with radio craft**: consistent loudness (−16 LUFS), crossfades, and the host talking over song intros with the music **ducked** underneath.
 6. **Output**: two audio files, `side-a.wav` and `side-b.wav`, each fitted precisely to the tape side.
@@ -93,14 +94,14 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 - `CassetteBay` — the cassette graphic: label header, title, reel window with two conic-gradient reels (spin when active), shell screws.
 - `StageList` — the PROGRESS SEQUENCE rows (LED + label + VT323 status) for the five generation stages.
 - `TransportStrip` — bottom bar: dual VU meters + status LCD + primary action button (REC / STOP / PRINT).
-- `JCard` — the unfolded, print-scaled inlay (front art panel, dashed fold + spine, two-column tracklist flap, credits).
+- `JCard` — the unfolded, print-scaled inlay (front art panel, dashed fold + spine, two-column tracklist flap, credits). The mockup's credit line ("SCRIPT BY CLAUDE") is rendered dynamically from the configured provider/model — e.g. "SCRIPT BY GPT-4O" or "SCRIPT BY LLAMA 3 (LOCAL)".
 
 ### 3.3 Screens
 
 1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S VIBE editor (LCD textarea + suggested genre chips), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
 2. **Generation** (`1b`) — PROGRAM SEQUENCE stage LEDs (Scan → Select → Write Script → Voice → Mix), SCRIPT MONITOR (streams the DJ script live), spinning CASSETTE BAY, TAPE COUNTER (`00:17:26 / 45:00` + progress bar), transport strip with animated VU + **STOP · CANCEL** and a "now fitting / duck / crossfade" status line.
 3. **J-card** (`1c`) — the unfolded inlay in a paper tray, OUTPUT list (`side-a.wav`, `side-b.wav`, `jcard.pdf`), **PRINT J-CARD / EXPORT PDF / REVEAL AUDIO FILES**, and a FIT REPORT (side slack, LUFS, ducking events).
-4. **Settings** (new — flagged in the transcript as the likely next screen) — API keys (Anthropic, ElevenLabs) stored in the OS keychain, local voice model management, default tape length, output folder, loudness target. Styled to match (inset panels + LCD fields).
+4. **Settings** (new — flagged in the transcript as the likely next screen) — **AI provider picker** (provider + model + API key, or Ollama/custom endpoint URL for local models) and ElevenLabs key, all secrets stored in the OS keychain; local voice model management; default tape length; output folder; loudness target. Styled to match (inset panels + LCD fields).
 
 ---
 
@@ -121,8 +122,10 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 │  Core  (Rust)                                                  │
 │  ├─ library    scan folder, read tags/duration, feature probe │
 │  │             → SQLite index (sqlx/rusqlite)                  │
-│  ├─ selection  Claude API: pick + sequence tracks to fit side │
-│  ├─ script     Claude API: DJ script (cold open, links, news, │
+│  ├─ ai         provider-agnostic LLM client (genai): user-    │
+│  │             selected provider/model, streaming, retries    │
+│  ├─ selection  via `ai`: pick + sequence tracks to fit side   │
+│  ├─ script     via `ai`: DJ script (cold open, links, news,   │
 │  │             flip reminder, sign-off) → timed segments      │
 │  ├─ tts        Piper (local, bundled) | ElevenLabs (HTTP)     │
 │  ├─ mix        decode → LUFS-normalize → crossfade → duck →   │
@@ -152,7 +155,7 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 | Resampling | `rubato` |
 | WAV encode | `hound` |
 | Library index DB | `rusqlite` (bundled SQLite) or `sqlx` |
-| Anthropic API | `reqwest` + typed request/response (Messages API, streaming, tool use) |
+| LLM client (multi-provider) | `genai` — one chat API across Anthropic, OpenAI, Gemini, Groq, xAI, DeepSeek, Cohere, and Ollama (local models); supports streaming and structured/JSON output. Custom OpenAI-compatible base URLs cover self-hosted/other providers. |
 | Local TTS | **Piper** (bundled binary + voice model) invoked as a sidecar, or `sherpa-rs` bindings |
 | Secret storage | `keyring` (macOS Keychain / Windows Credential Manager / libsecret) |
 | PDF (fallback path) | `printpdf` or Typst; primary path is webview print-to-PDF |
@@ -179,11 +182,19 @@ This is the core technical risk and the piece that makes it "a show, not a playl
 
 ---
 
-## 6. AI integration (Claude)
+## 6. AI integration (vendor-agnostic)
 
-Two distinct Claude calls, both using the user's own Anthropic key:
+All LLM access goes through a single `ai` module built on the **`genai`** crate, so the rest of the app never touches a provider SDK directly. The user chooses their provider and model in Settings:
 
-1. **Track selection & sequencing.** Input: the vibe prompt + a compact digest of the indexed library (artist, title, duration, tags/features) + target side length and count. Output (via **tool use / structured JSON**): an ordered tracklist per side with durations that fit, plus where host links go. Model must respect the total-time budget; the app validates and, if over/under, re-prompts or applies the fit solver in §5.6.
+- **Cloud:** Anthropic, OpenAI, Google Gemini, Groq, xAI, DeepSeek, Cohere — with their own API key.
+- **Local:** Ollama (no key, fully offline showmaking with local TTS).
+- **Anything else:** a custom OpenAI-compatible base URL + key.
+
+The `ai` module owns provider/model config, key retrieval from the keychain, streaming, retries/backoff, and a **capability shim**: structured output is requested via native JSON mode where the provider supports it, and falls back to prompt-enforced JSON + parse-and-repair where it doesn't, so both calls below behave identically on every provider. A "test connection" action in Settings validates the chosen provider/model before composing.
+
+Two distinct LLM calls, both using the user's configured provider:
+
+1. **Track selection & sequencing.** Input: the vibe prompt + a compact digest of the indexed library (artist, title, duration, tags/features) + target side length and count. Output (via **structured JSON** through the capability shim): an ordered tracklist per side with durations that fit, plus where host links go. Model must respect the total-time budget; the app validates and, if over/under, re-prompts or applies the fit solver in §5.6.
 2. **DJ script writing.** Input: the chosen sequence + era/artist context. Output: timed script segments — cold open, inter-song links (artist stories, era news), the **Side A flip reminder**, and the **Side B sign-off** — each tagged with which track it precedes/overlaps and an estimated spoken duration. **Stream** the response so the SCRIPT MONITOR fills live (matches the design's streaming LCD + blinking cursor).
 
 Spoken-duration estimates feed back into the fit solver so voice + music together still fit the side.
@@ -210,8 +221,9 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 - Incremental re-scan; progress feedback; handle unreadable/unsupported files gracefully.
 - **Demo:** point at a real folder → accurate "N tracks · X GB · INDEXED".
 
-### Phase 3 — Claude selection + script
-- Settings screen with Anthropic key stored via `keyring`.
+### Phase 3 — AI selection + script
+- Settings screen with the AI provider picker (provider, model, key or Ollama/custom endpoint) — secrets stored via `keyring` — plus a "test connection" check.
+- The `ai` module (`genai` wrapper, streaming, retries, structured-output capability shim).
 - Track selection/sequencing call (§6.1) → populates the tracklist that fits the side.
 - Script writing call (§6.2) **streamed** into the SCRIPT MONITOR; stage LEDs advance for real.
 - **Demo:** vibe prompt → a real, fitted tracklist + a live-written DJ script.
@@ -262,7 +274,8 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 | Risk | Mitigation |
 |---|---|
 | Audio format coverage in `symphonia` | Bundle `ffmpeg` sidecar as decode/encode fallback. |
-| Claude time-budget accuracy (over/under-fit) | Deterministic fit solver validates & repairs the AI's sequence; re-prompt on gross miss. |
+| LLM time-budget accuracy (over/under-fit) | Deterministic fit solver validates & repairs the AI's sequence; re-prompt on gross miss. |
+| Capability variance across providers (structured output, context size, small local models) | Capability shim (§6) + JSON parse-and-repair; chunk the library digest to fit smaller context windows; document recommended models. |
 | Local TTS quality/size | Piper default; ElevenLabs for premium; make voice models downloadable rather than all-bundled. |
 | Mix performance on large libraries | Index/feature-probe incrementally; mix only selected tracks; stream progress; run off the UI thread. |
 | Signing/notarization friction | Set up signing in CI early (Phase 7 spike can start in Phase 0). |
@@ -277,7 +290,7 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 │  ├─ lib/            store.ts (state machine), ipc.ts
 │  └─ assets/fonts/   VT323, Barlow, Barlow Condensed (.woff2)
 ├─ src-tauri/
-│  ├─ src/            library/ selection/ script/ tts/ mix/ jcard/ keys/ jobs/
+│  ├─ src/            library/ ai/ selection/ script/ tts/ mix/ jcard/ keys/ jobs/
 │  ├─ binaries/       piper, ffmpeg sidecars (per-arch)
 │  └─ tauri.conf.json
 ├─ tests/
