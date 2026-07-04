@@ -2,9 +2,11 @@
   export let title = 'Neon Rain Drivetime';
   export let side = 'SIDE A';
   export let spinning = false;
+  /** Stretch the bay to fill its column, centering the cassette in the deck. */
+  export let grow = false;
 </script>
 
-<div class="bay">
+<div class="bay" class:grow>
   <div class="shell">
     <div class="label">
       <div class="strip">
@@ -18,12 +20,16 @@
         <div class="reel right" class:spinning style={spinning ? 'animation-duration:2s' : ''}></div>
       </div>
     </div>
-    <div class="shell-screws">
+    <div class="trap">
+      <div class="hole small"></div>
       <div class="hole"></div>
       <div class="hole"></div>
-      <div class="hole"></div>
-      <div class="hole"></div>
+      <div class="hole small"></div>
     </div>
+    <div class="corner c1"></div>
+    <div class="corner c2"></div>
+    <div class="corner c3"></div>
+    <div class="corner c4"></div>
   </div>
 </div>
 
@@ -36,20 +42,24 @@
     display: grid;
     place-items: center;
   }
+  .grow {
+    flex: 1;
+  }
+  /* Real compact-cassette proportions: 100 × 63.5 mm ≈ 1.575:1 */
   .shell {
     position: relative;
     width: 100%;
-    height: 214px;
+    aspect-ratio: 1.575;
     border-radius: 10px;
     background: linear-gradient(180deg, #35373c, #232529);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
   .label {
     position: absolute;
-    top: 12px;
-    left: 14px;
-    right: 14px;
-    height: 136px;
+    top: 14px;
+    left: 16px;
+    right: 16px;
+    height: 60%;
     border-radius: 5px;
     background: var(--paper-label);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
@@ -75,8 +85,8 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 10px;
-    width: 236px;
+    bottom: 12px;
+    width: 52%;
     height: 62px;
     border-radius: 31px;
     background: #0d0d0f;
@@ -108,19 +118,44 @@
     background: linear-gradient(180deg, #3b2f22, #241a10);
     border-radius: 2px;
   }
-  .shell-screws {
+  /* The tape-guard trapezoid along the bottom edge, holes included. */
+  .trap {
     position: absolute;
-    bottom: 12px;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
+    width: 58%;
+    height: 24%;
+    clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%);
+    background: linear-gradient(180deg, #2c2e33, #212327);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
     display: flex;
-    gap: 26px;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding-top: 8px;
   }
   .hole {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: #101113;
     box-shadow: inset 0 1px 2px #000;
   }
+  .hole.small {
+    width: 6px;
+    height: 6px;
+  }
+  .corner {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #55585e, #26282c 70%);
+    box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.7);
+  }
+  .c1 { top: 7px; left: 7px; }
+  .c2 { top: 7px; right: 7px; }
+  .c3 { bottom: 7px; left: 7px; }
+  .c4 { bottom: 7px; right: 7px; }
 </style>

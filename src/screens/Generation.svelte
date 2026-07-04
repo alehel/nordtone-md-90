@@ -45,7 +45,7 @@
     </div>
 
     <div class="col">
-      <CassetteBay title={SHOW_TITLE} spinning />
+      <CassetteBay title={SHOW_TITLE} spinning grow />
       <InsetPanel label="TAPE COUNTER">
         <div slot="right" class="hint">SIDE A OF 2</div>
         <Lcd size="xl" center>{$counterLabel.elapsed} <span class="dim">/ {$counterLabel.total}</span></Lcd>

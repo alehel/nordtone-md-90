@@ -35,27 +35,33 @@
   <AppChrome led="ok" ledLabel="PWR" onSettings={openSettings} />
 
   <div class="main">
-    <div class="col">
-      <InsetPanel label="SOURCE LIBRARY">
-        <div slot="right" class="pill"><Led state="ok" /><span>INDEXED</span></div>
-        <div class="src-row">
-          <Lcd grow>{LIBRARY.path} — {LIBRARY.tracks.toLocaleString('en-US')} tracks · {LIBRARY.size}</Lcd>
-          <HardwareButton>BROWSE…</HardwareButton>
-        </div>
-      </InsetPanel>
+    <div class="row1">
+      <div class="col">
+        <InsetPanel label="SOURCE LIBRARY">
+          <div slot="right" class="pill"><Led state="ok" /><span>INDEXED</span></div>
+          <div class="src-row">
+            <Lcd grow>{LIBRARY.path} — {LIBRARY.tracks.toLocaleString('en-US')} tracks · {LIBRARY.size}</Lcd>
+            <HardwareButton>BROWSE…</HardwareButton>
+          </div>
+        </InsetPanel>
 
-      <InsetPanel label="TONIGHT'S MUSIC" grow>
-        <div slot="right" class="hint">IN YOUR OWN WORDS — SIMPLE OR DETAILED</div>
-        <div class="vibe-well">
-          <textarea bind:value={$vibe} spellcheck="false" aria-label="Tonight's music"></textarea>
-        </div>
-        <div class="chips">
-          {#each VIBE_CHIPS as chip}
-            <button class="chip" on:click={() => vibe.update((v) => (v ? v + ' · ' + chip : chip))}>{chip}</button>
-          {/each}
-        </div>
-      </InsetPanel>
+        <InsetPanel label="TONIGHT'S MUSIC" grow>
+          <div slot="right" class="hint">IN YOUR OWN WORDS — SIMPLE OR DETAILED</div>
+          <div class="vibe-well">
+            <textarea bind:value={$vibe} spellcheck="false" aria-label="Tonight's music"></textarea>
+          </div>
+          <div class="chips">
+            {#each VIBE_CHIPS as chip}
+              <button class="chip" on:click={() => vibe.update((v) => (v ? v + ' · ' + chip : chip))}>{chip}</button>
+            {/each}
+          </div>
+        </InsetPanel>
+      </div>
 
+      <CassetteBay title={SHOW_TITLE} spinning={false} />
+    </div>
+
+    <div class="row2">
       <InsetPanel label="SHOW FORMAT">
         <div slot="right" class="hint">THE HOST — PRESS A PRESET OR WRITE YOUR OWN</div>
         <div class="field-label">HOST PERSONALITY</div>
@@ -84,12 +90,8 @@
           </div>
         </div>
       </InsetPanel>
-    </div>
 
-    <div class="col">
-      <CassetteBay title={SHOW_TITLE} spinning={false} />
-
-      <div class="pair">
+      <div class="col">
         <InsetPanel label="TAPE LENGTH">
           <div class="tapes">
             {#each TAPES as t}
@@ -124,10 +126,18 @@
 
 <style>
   .main {
+    padding: 22px 34px 0;
+  }
+  .row1 {
     display: grid;
     grid-template-columns: 1fr 470px;
     gap: 22px;
-    padding: 22px 34px 0;
+  }
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 22px;
+    margin-top: 18px;
   }
   .col {
     display: flex;
@@ -241,11 +251,6 @@
   .talk :global(button) {
     padding: 7px 10px;
     font-size: 12px;
-  }
-  .pair {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
   }
   .tapes {
     display: flex;
