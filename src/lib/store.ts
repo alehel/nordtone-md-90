@@ -32,9 +32,10 @@ export const tape = writable<TapeId>('C90');
 export const premiumVoice = writable<boolean>(true);
 
 /* SHOW FORMAT (§3.5) — structured show-definition settings that the Phase 3
-   prompt builder merges with the free-text vibe. */
-export const hostPreset = writable<HostPresetId>('warm');
-/** Editable persona line; preset keys overwrite it, users can refine it. */
+   prompt builder merges with the free-text music description. Presets only
+   ever write into the editable persona text; hand-edited text deselects the
+   preset key (null) and is passed to the LLM verbatim. */
+export const hostPreset = writable<HostPresetId | null>('warm');
 export const persona = writable<string>(HOST_PRESETS[0].persona);
 export const talkLevel = writable<TalkLevel>('BALANCED');
 export const eraNews = writable<boolean>(true);

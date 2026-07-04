@@ -21,7 +21,7 @@ This plan translates the Claude Design handoff (`project/NORDTONE MD-90.html`, s
 ## 2. Product summary (what the app does)
 
 1. **Point** at a music folder → the app indexes it (tags, durations, basic audio features).
-2. **Describe a vibe** — free text, e.g. *"80s synth-pop, upbeat, a little melancholy."*
+2. **Describe tonight's music** — free text, as simple or as detailed as the user likes, e.g. *"80s synth-pop, upbeat, a little melancholy."* Experienced prompters can write full instructions here; it goes to the LLM verbatim.
 3. **Pick a tape length** — C60 / C90 / C120 (2 × 30 / 45 / 60 min sides).
 4. **Choose a host voice** — a free local voice by default, or a premium ElevenLabs voice.
 5. **Compose** (the red REC button):
@@ -97,7 +97,7 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 
 ### 3.3 Screens
 
-1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S VIBE editor (LCD textarea + suggested genre chips), **SHOW FORMAT panel** (host-personality presets, talk amount, era news — §3.5), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
+1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S MUSIC editor (free-text LCD textarea + suggested genre chips), **SHOW FORMAT panel** (host-personality presets, talk amount, era news — §3.5), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
 2. **Generation** (`1b`) — PROGRAM SEQUENCE stage LEDs (Scan → Select → Write Script → Voice → Mix), SCRIPT MONITOR (streams the DJ script live), spinning CASSETTE BAY, TAPE COUNTER (`00:17:26 / 45:00` + progress bar), transport strip with **STOP · CANCEL** and a "now fitting / duck / crossfade" status line.
 3. **J-card** (`1c`) — the unfolded inlay in a paper tray, OUTPUT list (`side-a.wav`, `side-b.wav`, `jcard.pdf`), **PRINT J-CARD / EXPORT PDF / REVEAL AUDIO FILES**, and a FIT REPORT (side slack, LUFS, ducking events).
 4. **Settings** (new — flagged in the transcript as the likely next screen) — **AI provider picker** (provider + model + API key, or Ollama/custom endpoint URL for local models) and ElevenLabs key, all secrets stored in the OS keychain; local voice model management; default tape length; output folder; loudness target; **FACEPLATE theme selector** (§3.4). Styled to match (inset panels + LCD fields).
@@ -134,13 +134,13 @@ Two changes were decided after the handoff and supersede the mockups:
 
 **VU meters removed.** The design's analog VU meters were decorative — they never carried information the tape counter and progress bar don't already show. The transport strip is now status LCD + primary action button; the `vuwig` animations and `--vu-*` tokens are gone. (If a themed VU ever earns its place — e.g. true level metering during a Phase 5 preview-render — it can return as a component, but it is not planned.)
 
-**SHOW FORMAT panel added (Setup).** Free-text vibe alone assumes the user is comfortable prompting. A structured panel beside it gives non-prompters granular, discoverable controls that the app composes into the LLM prompts (§6):
+**SHOW FORMAT panel added (Setup), and "TONIGHT'S VIBE" renamed "TONIGHT'S MUSIC".** A free-text field alone assumes the user is comfortable prompting; the rename makes its job obvious, and a structured panel beside it gives non-prompters granular, discoverable controls that the app composes into the LLM prompts (§6). The guiding rule is **presets assist, free text wins**: every structured control only ever writes into editable text, and hand-edited text deselects the preset and reaches the LLM verbatim — the panel must never cap what a skilled prompter can express.
 
-- **HOST PERSONALITY** — one-press preset keys, each mapping to a persona description shown on an LCD readout: e.g. *WARM FM* ("warm, unhurried, stories between songs"), *TOP-40 HYPE* ("fast, bright, countdown energy"), *DRY WIT* ("laconic, deadpan, one-liners"), *MIDNIGHT JAZZ* ("velvet, slow, after-hours"). Presets are starting points — the persona line remains editable text for users who want to go beyond them.
+- **HOST PERSONALITY** — one-press preset keys, each mapping to a persona description shown on an LCD readout: e.g. *WARM FM* ("warm, unhurried, stories between songs"), *TOP-40 HYPE* ("fast, bright, countdown energy"), *DRY WIT* ("laconic, deadpan, one-liners"), *MIDNIGHT JAZZ* ("velvet, slow, after-hours"). The persona line is editable text; editing it releases the preset key.
 - **TALK AMOUNT** — MINIMAL / BALANCED / CHATTY, controlling link frequency and length (and feeding the fit solver's time budget for speech).
 - **ERA NEWS** — on/off toggle for the "news items from the era of the music" segments.
 
-The vibe field stays for musical direction; the SHOW FORMAT panel shapes the *host and script*. Both are merged by the prompt builder, so a user can get a great show having typed nothing but a genre.
+TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*. Both are merged by the prompt builder, so a novice gets a great show having typed nothing but a genre, while a prompter can write exactly what they want in either field.
 
 ---
 
@@ -231,7 +231,7 @@ All LLM access goes through a single `ai` module built on the **`genai`** crate,
 
 The `ai` module owns provider/model config, key retrieval from the keychain, streaming, retries/backoff, and a **capability shim**: structured output is requested via native JSON mode where the provider supports it, and falls back to prompt-enforced JSON + parse-and-repair where it doesn't, so both calls below behave identically on every provider. A "test connection" action in Settings validates the chosen provider/model before composing.
 
-A **prompt builder** sits in front of both calls: it merges the free-text vibe with the structured SHOW FORMAT settings (§3.5 — host persona, talk amount, era news) into the system/user prompts, so casual users get well-formed prompts without writing them. Talk amount also sets the speech-time budget handed to the fit solver.
+A **prompt builder** sits in front of both calls: it merges the free-text TONIGHT'S MUSIC field with the structured SHOW FORMAT settings (§3.5 — host persona, talk amount, era news) into the system/user prompts, so casual users get well-formed prompts without writing them, and user-written text is always passed through verbatim (§3.5's "presets assist, free text wins"). Talk amount also sets the speech-time budget handed to the fit solver.
 
 Two distinct LLM calls, both using the user's configured provider:
 

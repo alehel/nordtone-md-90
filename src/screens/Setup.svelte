@@ -25,6 +25,10 @@
 
   if (!$vibe) vibe.set(DEFAULT_VIBE);
   $: selected = TAPES.find((t) => t.id === $tape) ?? TAPES[1];
+  // Hand-editing the persona line releases the preset key — free text wins.
+  $: if ($hostPreset && $persona !== HOST_PRESETS.find((p) => p.id === $hostPreset)?.persona) {
+    hostPreset.set(null);
+  }
 </script>
 
 <Panel>
@@ -40,10 +44,10 @@
         </div>
       </InsetPanel>
 
-      <InsetPanel label="TONIGHT'S VIBE" grow>
-        <div slot="right" class="hint">THE MUSIC — DESCRIBE THE SHOW</div>
+      <InsetPanel label="TONIGHT'S MUSIC" grow>
+        <div slot="right" class="hint">IN YOUR OWN WORDS — SIMPLE OR DETAILED</div>
         <div class="vibe-well">
-          <textarea bind:value={$vibe} spellcheck="false" aria-label="Tonight's vibe"></textarea>
+          <textarea bind:value={$vibe} spellcheck="false" aria-label="Tonight's music"></textarea>
         </div>
         <div class="chips">
           {#each VIBE_CHIPS as chip}
@@ -53,7 +57,7 @@
       </InsetPanel>
 
       <InsetPanel label="SHOW FORMAT">
-        <div slot="right" class="hint">THE HOST — NO PROMPTING NEEDED</div>
+        <div slot="right" class="hint">THE HOST — PRESS A PRESET OR WRITE YOUR OWN</div>
         <div class="field-label">HOST PERSONALITY</div>
         <div class="presets">
           {#each HOST_PRESETS as p}
