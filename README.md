@@ -10,8 +10,8 @@ See [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) for the full plan and [`d
 
 ## Status
 
-**Phase 0–1** (of 7): Tauri scaffold + pixel-perfect static UI with mocked data.
-The full flow is clickable — Setup → Generation (mock composer) → J-card — plus Settings, all in the charcoal/amber "hardware" design. No real indexing, AI, TTS, or mixing yet.
+**Phase 0–1** (of 7): Tauri scaffold + full static UI with mocked data.
+The full flow is clickable — Setup → Generation (mock composer) → J-card — plus Settings, in the "quiet studio" charcoal/amber design (conventional controls; the cassette illustration and printed J-card carry the retro character). No real indexing, AI, TTS, or mixing yet.
 
 ## Development
 

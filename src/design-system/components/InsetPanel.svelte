@@ -1,9 +1,10 @@
 <script lang="ts">
+  /** Card — the standard content container. */
   export let label = '';
   export let grow = false;
 </script>
 
-<div class="inset" class:grow>
+<div class="card" class:grow>
   {#if label || $$slots.right}
     <div class="head">
       <div class="label">{label}</div>
@@ -14,11 +15,11 @@
 </div>
 
 <style>
-  .inset {
-    background: var(--panel-inset);
-    border-radius: 10px;
-    box-shadow: var(--panel-inset-shadow);
-    padding: 14px 16px;
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
   }
   .grow {
     flex: 1;
@@ -27,14 +28,13 @@
   }
   .head {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 10px;
+    gap: 10px;
+    margin-bottom: 9px;
   }
   .label {
-    font: 600 11px var(--font-label);
-    letter-spacing: 2.5px;
-    color: var(--text-mut);
-    text-shadow: var(--emboss);
+    font: 600 13px var(--font-ui);
+    color: var(--text-body);
   }
 </style>

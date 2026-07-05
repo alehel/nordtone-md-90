@@ -2,87 +2,84 @@
   import Panel from '../design-system/components/Panel.svelte';
   import AppChrome from '../design-system/components/AppChrome.svelte';
   import InsetPanel from '../design-system/components/InsetPanel.svelte';
-  import Lcd from '../design-system/components/Lcd.svelte';
   import HardwareButton from '../design-system/components/HardwareButton.svelte';
   import { closeSettings } from '../lib/store';
 
-  const PROVIDERS = ['ANTHROPIC', 'OPENAI', 'GEMINI', 'GROQ', 'OLLAMA (LOCAL)', 'CUSTOM URL'];
-  let provider = 'ANTHROPIC';
+  const PROVIDERS = ['Anthropic', 'OpenAI', 'Gemini', 'Groq', 'Ollama (local)', 'Custom URL'];
+  let provider = 'Anthropic';
   let model = 'claude-sonnet-5';
   let apiKey = '';
   let elevenKey = '';
   const THEMES = [
-    { id: 'charcoal', label: 'CHARCOAL', ready: true },
-    { id: 'cream', label: 'CREAM', ready: false },
-    { id: 'grey', label: 'GREY', ready: false },
+    { id: 'charcoal', label: 'Charcoal', ready: true },
+    { id: 'cream', label: 'Cream · soon', ready: false },
+    { id: 'grey', label: 'Grey · soon', ready: false },
   ];
   let theme = 'charcoal';
 </script>
 
 <Panel>
-  <AppChrome subtitle="SETTINGS" led="ok" ledLabel="PWR" />
+  <AppChrome subtitle="Settings" />
 
   <div class="main">
     <div class="col">
-      <InsetPanel label="AI PROVIDER">
-        <div slot="right" class="hint">YOUR KEYS · STORED IN OS KEYCHAIN</div>
+      <InsetPanel label="AI provider">
+        <div slot="right" class="sub">your keys · stored in the OS keychain</div>
         <div class="providers">
           {#each PROVIDERS as p}
             <HardwareButton active={provider === p} on:click={() => (provider = p)}>{p}</HardwareButton>
           {/each}
         </div>
         <div class="field">
-          <div class="field-label">MODEL</div>
-          <div class="lcd-input">
-            <input bind:value={model} spellcheck="false" aria-label="Model" />
-          </div>
+          <div class="label-line">Model</div>
+          <input class="input" bind:value={model} spellcheck="false" aria-label="Model" />
         </div>
         <div class="field">
-          <div class="field-label">API KEY</div>
-          <div class="lcd-input">
-            <input type="password" bind:value={apiKey} placeholder="sk-…" aria-label="API key" />
-          </div>
+          <div class="label-line">API key</div>
+          <input class="input" type="password" bind:value={apiKey} placeholder="sk-…" aria-label="API key" />
         </div>
         <div class="test-row">
-          <HardwareButton>TEST CONNECTION</HardwareButton>
-          <Lcd size="sm" grow><span class="dim">NOT TESTED</span></Lcd>
+          <HardwareButton>Test connection</HardwareButton>
+          <span class="sub">Not tested</span>
         </div>
       </InsetPanel>
 
-      <InsetPanel label="HOST VOICE · ELEVENLABS">
+      <InsetPanel label="Host voice · ElevenLabs">
         <div class="field">
-          <div class="field-label">API KEY</div>
-          <div class="lcd-input">
-            <input type="password" bind:value={elevenKey} placeholder="optional — local voice is free" aria-label="ElevenLabs key" />
-          </div>
+          <div class="label-line">API key</div>
+          <input
+            class="input"
+            type="password"
+            bind:value={elevenKey}
+            placeholder="optional — the local voice is free"
+            aria-label="ElevenLabs key"
+          />
         </div>
       </InsetPanel>
     </div>
 
     <div class="col">
-      <InsetPanel label="FACEPLATE">
+      <InsetPanel label="Appearance">
         <div class="providers">
           {#each THEMES as t}
-            <HardwareButton active={theme === t.id} on:click={() => t.ready && (theme = t.id)}>
-              {t.label}{t.ready ? '' : ' · SOON'}
-            </HardwareButton>
+            <HardwareButton active={theme === t.id} on:click={() => t.ready && (theme = t.id)}>{t.label}</HardwareButton>
           {/each}
         </div>
       </InsetPanel>
 
-      <InsetPanel label="DEFAULTS">
+      <InsetPanel label="Defaults">
         <div class="field">
-          <div class="field-label">OUTPUT FOLDER</div>
-          <Lcd size="sm">~/Music/MD-90 Shows</Lcd>
+          <div class="label-line">Output folder</div>
+          <input class="input" value="~/Music/MD-90 Shows" readonly />
         </div>
         <div class="field">
-          <div class="field-label">LOUDNESS TARGET</div>
-          <Lcd size="sm">−16.0 LUFS</Lcd>
+          <div class="label-line">Loudness target</div>
+          <input class="input" value="−16.0 LUFS" readonly />
         </div>
       </InsetPanel>
 
       <div class="back">
-        <HardwareButton accent block on:click={closeSettings}>◂ BACK</HardwareButton>
+        <HardwareButton accent block on:click={closeSettings}>◂ Back</HardwareButton>
       </div>
     </div>
   </div>
@@ -91,19 +88,18 @@
 <style>
   .main {
     display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 22px;
-    padding: 22px 34px 0;
+    grid-template-columns: 1fr 280px;
+    gap: 16px;
+    padding: 18px 20px;
   }
   .col {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
   }
-  .hint {
-    font: 500 10px var(--font-label);
-    letter-spacing: 1.5px;
-    color: var(--text-mut3);
+  .sub {
+    font: 400 12.5px var(--font-ui);
+    color: var(--text-dim);
   }
   .providers {
     display: flex;
@@ -114,36 +110,14 @@
   .field {
     margin-bottom: 10px;
   }
-  .field-label {
-    font: 600 10px var(--font-label);
-    letter-spacing: 2px;
-    color: var(--text-mut3);
-    margin-bottom: 5px;
-  }
-  .lcd-input {
-    display: flex;
-    background: var(--lcd-bg);
-    border-radius: 6px;
-    box-shadow: var(--lcd-shadow);
-    padding: 8px 12px;
-  }
-  input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    font: 17px var(--font-lcd);
-    color: var(--lcd-fg);
-    text-shadow: 0 0 8px var(--lcd-glow);
-    caret-color: var(--lcd-fg);
-  }
-  input::placeholder {
-    color: var(--lcd-fg-dim);
-    text-shadow: none;
+  .label-line {
+    font: 600 13px var(--font-ui);
+    color: var(--text-body);
+    margin-bottom: 6px;
   }
   .test-row {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
   }
   .back {

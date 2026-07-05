@@ -1,56 +1,51 @@
 <script lang="ts">
-  /** Amber-on-black readout well. */
+  /** Read-only display field (formerly the LCD well; now a flat field). */
   export let size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
   export let cursor = false;
   export let center = false;
   export let grow = false;
-  const fonts = { sm: '15px', md: '16px', lg: '18px', xl: '26px' };
+  const fonts = { sm: '13px', md: '15px', lg: '15px', xl: '26px' };
 </script>
 
-<div
-  class="lcd"
-  class:center
-  class:grow
-  style="font-size:{fonts[size]}"
->
-  <slot />{#if cursor}<span class="cursor"></span>{/if}
+<div class="field {size}" class:center class:grow style="font-size:{fonts[size]}">
+  <slot />{#if cursor}<span class="caret"></span>{/if}
 </div>
 
 <style>
-  .lcd {
-    background: var(--lcd-bg);
-    border-radius: 6px;
-    box-shadow: var(--lcd-shadow);
-    padding: 9px 12px;
-    font-family: var(--font-lcd);
+  .field {
+    background: var(--field-bg);
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--font-ui);
     line-height: 1.5;
-    color: var(--lcd-fg);
-    text-shadow: 0 0 8px var(--lcd-glow);
+    color: var(--text-hi);
     overflow: hidden;
+  }
+  .xl {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 6px 12px;
   }
   .center {
     text-align: center;
-    padding: 5px 12px;
   }
   .grow {
     flex: 1;
   }
-  .lcd :global(.dim) {
-    color: var(--lcd-fg-dim);
-    text-shadow: none;
+  .field :global(.dim) {
+    color: var(--text-dim);
   }
-  .lcd :global(.ok) {
-    color: var(--lcd-ok);
-    text-shadow: none;
+  .field :global(.ok) {
+    color: var(--ok-text);
   }
-  .cursor {
+  .caret {
     display: inline-block;
-    width: 10px;
+    width: 2px;
     height: 1em;
-    background: var(--lcd-fg);
-    vertical-align: -0.15em;
+    background: var(--accent);
+    vertical-align: -0.12em;
     margin-left: 2px;
-    animation: cursor 1.1s steps(1) infinite;
-    box-shadow: 0 0 8px var(--lcd-glow);
+    animation: caret 1.1s steps(1) infinite;
   }
 </style>

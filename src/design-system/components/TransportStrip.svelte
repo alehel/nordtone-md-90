@@ -1,33 +1,29 @@
-<div class="strip">
+<div class="footer">
   <div class="status"><slot name="status" /></div>
   <div class="action"><slot name="action" /></div>
 </div>
 
 <style>
-  .strip {
+  .footer {
     display: flex;
     align-items: center;
-    gap: 26px;
-    margin: 22px 34px 0;
-    padding: 16px 20px;
-    background: var(--transport-bg);
-    border-radius: 12px;
-    box-shadow: var(--transport-shadow);
+    gap: 16px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--window-border);
   }
   .status {
     flex: 1;
     min-width: 0;
+    font: 400 12.5px/1.5 var(--font-ui);
+    color: var(--text-dim);
+  }
+  .status :global(b) {
+    color: var(--text-body);
+    font-weight: 600;
   }
   .action {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-  }
-  .action :global(.caption) {
-    font: 600 11px var(--font-label);
-    letter-spacing: 2.5px;
-    color: var(--text-mut);
-    text-shadow: var(--emboss);
+    gap: 10px;
   }
 </style>

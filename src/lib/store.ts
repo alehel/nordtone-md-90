@@ -66,7 +66,7 @@ export const tapeInfo = derived([tape, customMinutes], ([t, mins]) => {
    preset key (null) and is passed to the LLM verbatim. */
 export const hostPreset = writable<HostPresetId | null>('warm');
 export const persona = writable<string>(HOST_PRESETS[0].persona);
-export const talkLevel = writable<TalkLevel>('BALANCED');
+export const talkLevel = writable<TalkLevel>('Balanced');
 
 /* HOST VOICE — selection is remembered per engine, so toggling engines
    doesn't lose your pick. Voice lists are engine-specific (§3.5). */
@@ -77,19 +77,10 @@ export const currentVoice = derived(
   [premiumVoice, localVoiceIdx, elevenVoiceIdx],
   ([premium, li, ei]) => {
     const list = premium ? VOICES.elevenlabs : VOICES.local;
-    const idx = ((premium ? ei : li) % list.length + list.length) % list.length;
-    return { ...list[idx], engine: premium ? 'ELEVENLABS' : 'LOCAL', pos: idx + 1, count: list.length };
+    const idx = (((premium ? ei : li) % list.length) + list.length) % list.length;
+    return { ...list[idx], engine: premium ? 'ElevenLabs' : 'Local', idx, count: list.length };
   },
 );
-
-export function stepVoice(dir: 1 | -1): void {
-  const target = get(premiumVoice) ? elevenVoiceIdx : localVoiceIdx;
-  const len = get(premiumVoice) ? VOICES.elevenlabs.length : VOICES.local.length;
-  target.update((i) => (i + dir + len) % len);
-}
-
-/** Which editor window is open on the Setup faceplate. */
-export const editor = writable<'music' | 'format' | 'tape' | null>(null);
 
 /* SHOW CLOCK (§3.5) — when the show was recorded. Used in the host's intro,
    to filter track selection to music released by then, to period-lock the
@@ -101,10 +92,13 @@ export const clockYear = writable<number>(1985);
 export const clockMonth = writable<number | null>(null);
 
 export const clockLabel = derived([clockSet, clockYear, clockMonth], ([on, y, m]) => {
-  if (!on) return 'TODAY';
+  if (!on) return 'today';
   const year = Math.min(2100, Math.max(1900, Math.round(Number(y) || 1985)));
   return m === null ? String(year) : `${MONTHS[m]} ${year}`;
 });
+
+/** Which editor window is open on the Setup screen. */
+export const editor = writable<'format' | 'tape' | null>(null);
 
 export function applyHostPreset(id: HostPresetId): void {
   hostPreset.set(id);
@@ -112,11 +106,11 @@ export function applyHostPreset(id: HostPresetId): void {
 }
 
 const IDLE_STAGES: Stage[] = [
-  { label: 'SCAN LIBRARY', state: 'idle', status: '' },
-  { label: 'SELECT TRACKS', state: 'idle', status: '' },
-  { label: 'WRITE SCRIPT', state: 'idle', status: '' },
-  { label: 'VOICE HOST', state: 'idle', status: 'elevenlabs · "vesla"' },
-  { label: 'MIX SIDES', state: 'idle', status: '−16 LUFS · crossfade · duck' },
+  { label: 'Scan library', state: 'idle', status: '' },
+  { label: 'Select tracks', state: 'idle', status: '' },
+  { label: 'Write script', state: 'idle', status: '' },
+  { label: 'Voice host', state: 'idle', status: '' },
+  { label: 'Mix sides', state: 'idle', status: '−16 LUFS · crossfade · duck' },
 ];
 
 export const stages = writable<Stage[]>(IDLE_STAGES);
@@ -170,7 +164,7 @@ export function startCompose(): void {
         setStage(2, 'done', '26 links written');
         setStage(3, 'busy', 'rendering voice…');
         later(() => {
-          setStage(3, 'done', 'elevenlabs · "vesla"');
+          setStage(3, 'done', get(currentVoice).label);
           setStage(4, 'busy', '−16 LUFS · crossfade · duck');
           runCounter();
         }, 2600);

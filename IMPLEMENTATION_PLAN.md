@@ -131,9 +131,18 @@ The 1d/1e studies only cover a subset of the UI, so building them as full themes
 
 ### 3.5 Deliberate deltas from the handoff design
 
-These changes were decided after the handoff and supersede the mockups:
+These changes were decided after the handoff and supersede the mockups. **Where §3.1–3.3 conflict with this section, this section wins.**
 
-**VU meters removed.** The design's analog VU meters were decorative — they never carried information the tape counter and progress bar don't already show. The transport strip is now status LCD + primary action button; the `vuwig` animations and `--vu-*` tokens are gone. (If a themed VU ever earns its place — e.g. true level metering during a Phase 5 preview-render — it can return as a component, but it is not planned.)
+**Aesthetic recalibrated to "quiet studio app" (largest delta).** After evaluating the full skeuomorph against usability, the direction moved to a conventional dark application carrying the charcoal/amber brand palette:
+
+- Conventional, readable controls everywhere: Barlow sentence-case labels and content, real text fields with visible focus rings, labeled buttons, segmented controls, dropdown selects, a visible Settings action, an amber primary button ("● Record show").
+- The hardware skeuomorphism is retired: no screws, no beveled key travel, no LCD glow wells, no VU meters, no round REC/STOP hardware buttons, no embossed text.
+- Two playful elements survive deliberately: the **flat cassette illustration** (label, reel window, spinning reels while composing) and the **printed J-card**, which keeps its full paper/VT323 aesthetic — it's an artifact, not UI.
+- `VT323` is confined to those two artifacts; all UI text is Barlow (+ Barlow Condensed for the wordmark).
+- The token/theme architecture (§3.4) is unchanged in mechanism; the charcoal theme's *values* are now flat surfaces (window/card/field/overlay + accent) instead of gradients and inset shadows. The cream/grey alternate themes still apply as palettes.
+- §3.1's gradient/shadow values and §3.2's hardware component descriptions document the *original* skeuomorph for reference; component names persist in code (`HardwareButton` is now the standard button, `Lcd` the read-only field, `CassetteBay` the flat cassette).
+
+**VU meters removed.** The design's analog VU meters were decorative — they never carried information the tape counter and progress bar don't already show. (Subsumed by the quiet-studio direction above, but the decision predates it.)
 
 **SHOW FORMAT panel added (Setup), and "TONIGHT'S VIBE" renamed "TONIGHT'S MUSIC".** A free-text field alone assumes the user is comfortable prompting; the rename makes its job obvious, and a structured panel beside it gives non-prompters granular, discoverable controls that the app composes into the LLM prompts (§6). The guiding rule is **presets assist, free text wins**: every structured control only ever writes into editable text, and hand-edited text deselects the preset and reaches the LLM verbatim — the panel must never cap what a skilled prompter can express.
 

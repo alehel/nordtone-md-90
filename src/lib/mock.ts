@@ -1,4 +1,5 @@
-/** Phase 1 mock data — verbatim from the design handoff. */
+/** Phase 1 mock data — content from the design handoff, restyled for the
+ * "quiet studio" direction (IMPLEMENTATION_PLAN §3.5). */
 
 export interface Track {
   n: string;
@@ -13,49 +14,6 @@ export const DEFAULT_VIBE =
 
 export const VIBE_CHIPS = ['synthwave', 'new wave', 'italo disco'];
 
-/** SHOW FORMAT presets (IMPLEMENTATION_PLAN §3.5) — one-press host personas. */
-export const HOST_PRESETS = [
-  { id: 'warm', label: 'WARM FM', persona: 'warm, unhurried — stories between songs' },
-  { id: 'hype', label: 'TOP-40 HYPE', persona: 'fast, bright — countdown energy' },
-  { id: 'wit', label: 'DRY WIT', persona: 'laconic, deadpan — one-liners' },
-  { id: 'jazz', label: 'MIDNIGHT JAZZ', persona: 'velvet, slow — after-hours' },
-] as const;
-export type HostPresetId = (typeof HOST_PRESETS)[number]['id'];
-
-export const TALK_LEVELS = ['MINIMAL', 'BALANCED', 'CHATTY'] as const;
-export type TalkLevel = (typeof TALK_LEVELS)[number];
-
-/** Voice lists are engine-specific (IMPLEMENTATION_PLAN §3.5): LOCAL = Piper
- * voice models installed via Settings; ELEVENLABS = voices fetched from the
- * user's account. Mocked until Phase 4. */
-export const VOICES = {
-  local: [
-    { id: 'nora', label: '"NORA" · CLEAR & CLOSE' },
-    { id: 'finn', label: '"FINN" · SOFT BARITONE' },
-    { id: 'eir', label: '"EIR" · BRIGHT MORNING' },
-  ],
-  elevenlabs: [
-    { id: 'vesla', label: '"VESLA" · WARM FM' },
-    { id: 'bjorn', label: '"BJØRN" · DEEP LATE-NIGHT' },
-    { id: 'liv', label: '"LIV" · CRISP TOP-40' },
-  ],
-} as const;
-
-export const MONTHS = [
-  'JANUARY',
-  'FEBRUARY',
-  'MARCH',
-  'APRIL',
-  'MAY',
-  'JUNE',
-  'JULY',
-  'AUGUST',
-  'SEPTEMBER',
-  'OCTOBER',
-  'NOVEMBER',
-  'DECEMBER',
-] as const;
-
 export const SHOW_TITLE = 'Neon Rain Drivetime';
 
 export const TAPES = [
@@ -64,6 +22,49 @@ export const TAPES = [
   { id: 'C120', perSide: '60:00', est: 32 },
 ] as const;
 export type TapeId = (typeof TAPES)[number]['id'];
+
+/** SHOW FORMAT presets (IMPLEMENTATION_PLAN §3.5) — one-press host personas. */
+export const HOST_PRESETS = [
+  { id: 'warm', label: 'Warm FM', persona: 'warm, unhurried — stories between songs' },
+  { id: 'hype', label: 'Top-40 hype', persona: 'fast, bright — countdown energy' },
+  { id: 'wit', label: 'Dry wit', persona: 'laconic, deadpan — one-liners' },
+  { id: 'jazz', label: 'Midnight jazz', persona: 'velvet, slow — after-hours' },
+] as const;
+export type HostPresetId = (typeof HOST_PRESETS)[number]['id'];
+
+export const TALK_LEVELS = ['Minimal', 'Balanced', 'Chatty'] as const;
+export type TalkLevel = (typeof TALK_LEVELS)[number];
+
+/** Voice lists are engine-specific (IMPLEMENTATION_PLAN §3.5): LOCAL = Piper
+ * voice models installed via Settings; ELEVENLABS = voices fetched from the
+ * user's account. Mocked until Phase 4. */
+export const VOICES = {
+  local: [
+    { id: 'nora', label: '"Nora" · clear & close' },
+    { id: 'finn', label: '"Finn" · soft baritone' },
+    { id: 'eir', label: '"Eir" · bright morning' },
+  ],
+  elevenlabs: [
+    { id: 'vesla', label: '"Vesla" · warm FM' },
+    { id: 'bjorn', label: '"Bjørn" · deep late-night' },
+    { id: 'liv', label: '"Liv" · crisp Top-40' },
+  ],
+} as const;
+
+export const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
 
 export const SIDE_A: Track[] = [
   { n: '01', title: 'Cold open — your host, Vesla', dur: '1:12' },
@@ -92,10 +93,10 @@ export const SCRIPT_TEXT =
   'don’t touch that dial…';
 
 export const NOW_FITTING = [
-  'A-HA — TAKE ON ME (3:48)',
-  'KIM WILDE — CAMBODIA (3:56)',
-  'DEPECHE MODE — BUT NOT TONIGHT (4:16)',
-  'ALPHAVILLE — FOREVER YOUNG (3:45)',
+  'A-ha — Take On Me (3:48)',
+  'Kim Wilde — Cambodia (3:56)',
+  'Depeche Mode — But Not Tonight (4:16)',
+  'Alphaville — Forever Young (3:45)',
 ];
 
 export const FIT_REPORT = {

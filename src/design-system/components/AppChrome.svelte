@@ -2,9 +2,8 @@
   import Led from './Led.svelte';
   import { windowMinimize, windowToggleMaximize, windowClose, windowStartDragging, isTauri } from '../../lib/ipc';
 
-  export let subtitle = 'RADIO CASSETTE COMPOSER';
-  export let led: 'ok' | 'busy' | 'off' = 'ok';
-  export let ledLabel = 'PWR';
+  export let subtitle = 'Radio cassette composer';
+  export let led: 'ok' | 'busy' | 'off' = 'off';
   export let onSettings: (() => void) | null = null;
 
   function drag(e: MouseEvent) {
@@ -15,13 +14,14 @@
 <div class="chrome" on:mousedown|self={drag} role="presentation">
   <div class="wordmark" on:mousedown={drag} role="presentation">NORDTONE</div>
   <div class="badge">MD-90</div>
-  <div class="subtitle" on:mousedown={drag} role="presentation">{subtitle}</div>
+  <div class="subtitle" on:mousedown={drag} role="presentation">
+    {#if led !== 'off'}<Led state={led} size={7} />{/if}
+    {subtitle}
+  </div>
   <div class="spacer" on:mousedown={drag} role="presentation"></div>
   <div class="right">
-    <Led state={led} />
-    <div class="ledlabel">{ledLabel}</div>
     {#if onSettings}
-      <button class="winbtn set" title="Settings" on:click={onSettings}>SET</button>
+      <button class="ghost" on:click={onSettings}>Settings</button>
     {/if}
     <button class="winbtn" title="Minimize" on:click={() => windowMinimize()}>–</button>
     <button class="winbtn sq" title="Maximize" on:click={() => windowToggleMaximize()}>□</button>
@@ -33,31 +33,29 @@
   .chrome {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px 34px 14px;
-    border-bottom: var(--chrome-divider);
-    box-shadow: var(--chrome-divider-glow);
+    gap: 12px;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--window-border);
   }
   .wordmark {
-    font: 700 21px var(--font-label);
-    letter-spacing: 5px;
-    color: var(--wordmark);
-    text-shadow: var(--wordmark-emboss);
+    font: 700 15px var(--font-label);
+    letter-spacing: 3px;
+    color: var(--text-hi);
   }
   .badge {
-    font: 600 12px var(--font-label);
-    letter-spacing: 2px;
-    color: var(--accent-badge-fg);
-    background: var(--accent-badge);
-    padding: 2px 8px;
+    font: 600 10.5px var(--font-label);
+    letter-spacing: 1.5px;
+    color: var(--accent-fg);
+    background: var(--accent-grad);
+    padding: 1px 7px;
     border-radius: 3px;
-    box-shadow: var(--accent-badge-shadow);
   }
   .subtitle {
-    font: 500 11px var(--font-label);
-    letter-spacing: 2.5px;
-    color: var(--text-mut2);
-    text-shadow: var(--emboss);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font: 400 13px var(--font-ui);
+    color: var(--text-dim);
   }
   .spacer {
     flex: 1;
@@ -66,39 +64,37 @@
   .right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
-  .ledlabel {
-    font: 500 10px var(--font-label);
-    letter-spacing: 2px;
-    color: var(--text-mut2);
-    margin-right: 10px;
+  .ghost {
+    font: 600 13px var(--font-ui);
+    color: var(--accent);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 9px;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+  .ghost:hover {
+    background: var(--accent-soft-bg);
   }
   .winbtn {
-    width: 22px;
-    height: 16px;
+    width: 26px;
+    height: 22px;
     border: none;
-    border-radius: 3px;
-    background: var(--btn-face);
-    box-shadow: inset 0 1px 0 var(--btn-top), 0 2px 3px rgba(0, 0, 0, 0.5);
-    display: grid;
-    place-items: center;
-    color: var(--text-mut);
-    font: 600 10px var(--font-ui);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-dim);
+    font: 500 13px var(--font-ui);
     cursor: pointer;
     padding: 0;
   }
-  .winbtn:active {
-    transform: translateY(1px);
+  .winbtn:hover {
+    background: var(--btn-bg);
+    color: var(--text-hi);
   }
   .sq {
-    font-size: 9px;
-  }
-  .set {
-    width: auto;
-    padding: 0 6px;
-    font: 600 8px var(--font-label);
-    letter-spacing: 1px;
-    margin-right: 6px;
+    font-size: 11px;
   }
 </style>

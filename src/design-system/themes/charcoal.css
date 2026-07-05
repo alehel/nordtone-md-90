@@ -1,85 +1,66 @@
 /*
- * Theme: charcoal (default) — night-radio charcoal & amber.
- * Values extracted verbatim from the Claude Design handoff (screens 1a–1c).
+ * Theme: charcoal (default) — "quiet studio app" (IMPLEMENTATION_PLAN §3.5).
+ * Conventional flat UI carrying the charcoal/amber brand palette.
  */
 :root[data-theme='charcoal'] {
-  --app-bg: #101114;
+  --app-bg: #0b0c0e;
 
-  --panel-face: linear-gradient(180deg, #45484e 0%, #33353a 8%, #2a2c30 60%, #242629 100%);
-  --panel-face-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -3px 6px rgba(0, 0, 0, 0.5),
-    0 24px 60px rgba(0, 0, 0, 0.55);
-  --panel-inset: #1d1e21;
-  --panel-inset-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.06);
-  --panel-tray-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.06);
-  --transport-bg: linear-gradient(180deg, #26282c, #1f2124);
-  --transport-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -2px 5px rgba(0, 0, 0, 0.4);
-  --chrome-divider: 1px solid rgba(0, 0, 0, 0.45);
-  --chrome-divider-glow: 0 1px 0 rgba(255, 255, 255, 0.06);
-
-  --lcd-bg: linear-gradient(180deg, #0e0b06, #1a130a);
-  --lcd-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9);
-  --lcd-fg: #ffb14e;
-  --lcd-fg-dim: #8f6a35;
-  --lcd-glow: rgba(255, 150, 40, 0.45);
-  --lcd-ok: #5f9c74;
-
-  --chip-fg: #8f6a35;
-  --chip-bg: #15110a;
-  --chip-border: #2a2114;
-
-  --accent: #ffab40;
-  --accent-glow: rgba(255, 171, 64, 0.9);
-  --accent-badge: linear-gradient(180deg, #ffc36b, #f09a2e);
-  --accent-badge-fg: #101114;
-  --accent-badge-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.5);
-  --accent-btn-drop: #7a4c10;
-
-  --btn-face: linear-gradient(180deg, #4c4f55, #33353a);
-  --btn-fg: #c9ccd2;
-  --btn-drop: #1a1b1e;
-  --btn-top: rgba(255, 255, 255, 0.15);
-  --btn-active-bg: linear-gradient(180deg, #3a3226, #2b2115);
-  --btn-active-fg: #ffd9a0;
-  --btn-active-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7), 0 1px 0 #1a1b1e,
-    0 0 12px rgba(255, 171, 64, 0.25);
-
-  --rec-btn: radial-gradient(circle at 38% 30%, #ff7a70, #c0392b 55%, #8e2418);
-  --rec-drop: #5f180f;
-
-  --led-ok: radial-gradient(circle at 35% 30%, #9dffb8, #2ea052);
-  --led-ok-glow: rgba(70, 220, 120, 0.7);
-  --led-busy: radial-gradient(circle at 35% 30%, #ffd9a0, #e08a1e);
-  --led-busy-glow: rgba(255, 171, 64, 0.9);
-  --led-off: #3a3c40;
+  --window-bg: #1a1b1e;
+  --window-border: rgba(255, 255, 255, 0.07);
+  --card-bg: #212226;
+  --card-border: rgba(255, 255, 255, 0.06);
+  --field-bg: #141518;
+  --field-border: rgba(255, 255, 255, 0.1);
+  --overlay-bg: #1f2023;
 
   --text-hi: #e8e4da;
-  --text-mid: #c9ccd2;
+  --text-body: #c9ccd2;
   --text-mut: #9aa0a8;
-  --text-mut2: #84888f;
-  --text-mut3: #6f747c;
-  --wordmark: #d8d4ca;
-  --emboss: 0 -1px 0 rgba(0, 0, 0, 0.6);
-  --wordmark-emboss: 0 -1px 0 rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.08);
+  --text-dim: #84888f;
 
-  --screw: radial-gradient(circle at 35% 30%, #8a8d93, #3a3c40 70%);
-  --screw-slot: #1c1d20;
+  --accent: #ffab40;
+  --accent-grad: linear-gradient(180deg, #ffc36b, #f09a2e);
+  --accent-fg: #181004;
+  --accent-soft-bg: rgba(255, 171, 64, 0.08);
+  --accent-soft-border: rgba(255, 171, 64, 0.22);
+  --accent-soft-fg: #c8a06a;
+  --focus-ring: rgba(255, 171, 64, 0.18);
 
-  --switch-well: linear-gradient(180deg, #151618, #232528);
-  --switch-knob: linear-gradient(180deg, #5a5e66, #3b3e44);
+  --btn-bg: #33353a;
+  --btn-bg-hover: #3b3e44;
+  --btn-border: rgba(255, 255, 255, 0.1);
+  --selected-bg: #3a3226;
+  --selected-fg: #ffd9a0;
+  --selected-border: rgba(255, 171, 64, 0.25);
 
-  --progress-track: #121316;
+  --dot-ok: radial-gradient(circle at 35% 30%, #9dffb8, #2ea052);
+  --dot-busy: radial-gradient(circle at 35% 30%, #ffd9a0, #e08a1e);
+  --dot-off: #3a3c40;
+  --ok-text: #5f9c74;
+
+  --progress-track: #141518;
   --progress-fill: linear-gradient(90deg, #8a5a1c, #ffab40);
-  --progress-glow: rgba(255, 171, 64, 0.6);
 
-  /* Paper goods (cassette label, VU faces, J-card) stay cream in every theme;
-     only the accent applied to them follows the faceplate. */
+  /* Flat cassette illustration */
+  --cas-shell: #26272b;
+  --cas-shell-border: rgba(255, 255, 255, 0.08);
+  --cas-label: #efe9d9;
+  --cas-strip: #f0a63c;
+  --cas-strip-ink: #3a2708;
+  --cas-ink: #3b342a;
+  --cas-window: #101113;
+  --cas-reel: repeating-conic-gradient(#d8d4ca 0deg 26deg, #17181a 26deg 60deg);
+  --cas-reel-ring: #241d16;
+
+  /* Paper goods (printed J-card) — unchanged artifact aesthetic */
   --paper: #faf6ec;
   --paper-mid: #f3edde;
-  --paper-label: linear-gradient(180deg, #f2ecdc, #e6ddc6);
   --paper-ink: #3b342a;
   --paper-ink-soft: #4a4336;
   --paper-mut: #8a7d5e;
   --paper-rule: #b9ae94;
   --jcard-art: linear-gradient(160deg, #20242e 0%, #2b3346 55%, #4a3a58 100%);
   --jcard-art-fg: #f0e7d2;
+  --lcd-fg: #ffb14e; /* J-card front accent text */
+  --accent-glow: rgba(255, 171, 64, 0.8); /* J-card accent line */
 }

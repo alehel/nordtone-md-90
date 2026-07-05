@@ -1,14 +1,10 @@
 <script lang="ts">
-  /**
-   * Editor window (IMPLEMENTATION_PLAN §3.5): a smaller hardware module
-   * overlaying the dimmed faceplate. Contents are free to change/grow
-   * without affecting the main view's layout.
-   */
+  /** Editor dialog (IMPLEMENTATION_PLAN §3.5). */
   import { createEventDispatcher } from 'svelte';
   import HardwareButton from './HardwareButton.svelte';
 
   export let label = '';
-  export let width = 660;
+  export let width = 640;
 
   const dispatch = createEventDispatcher();
   const close = () => dispatch('close');
@@ -22,16 +18,16 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 <div class="backdrop" on:mousedown|self={close}>
-  <div class="module" role="dialog" aria-modal="true" aria-label={label} style="width:{width}px">
+  <div class="dialog" role="dialog" aria-modal="true" aria-label={label} style="width:{width}px">
     <div class="head">
-      <div class="label">{label}</div>
+      <div class="title">{label}</div>
       <button class="close" title="Close" on:click={close}>×</button>
     </div>
     <div class="body">
       <slot />
     </div>
     <div class="foot">
-      <HardwareButton accent on:click={close}>DONE</HardwareButton>
+      <HardwareButton accent on:click={close}>Done</HardwareButton>
     </div>
   </div>
 </div>
@@ -41,56 +37,51 @@
     position: fixed;
     inset: 0;
     z-index: 50;
-    background: rgba(5, 6, 8, 0.62);
+    background: rgba(5, 6, 8, 0.6);
     display: grid;
     place-items: center;
   }
-  .module {
+  .dialog {
     max-width: calc(100vw - 48px);
     max-height: calc(100vh - 48px);
     overflow: auto;
     border-radius: 12px;
-    background: var(--panel-face);
-    box-shadow: var(--panel-face-shadow);
-    padding: 0 0 16px;
+    background: var(--overlay-bg);
+    border: 1px solid var(--window-border);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
   }
   .head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 13px 20px 11px;
-    border-bottom: var(--chrome-divider);
-    box-shadow: var(--chrome-divider-glow);
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--window-border);
   }
-  .label {
-    font: 600 13px var(--font-label);
-    letter-spacing: 3px;
-    color: var(--wordmark);
-    text-shadow: var(--wordmark-emboss);
+  .title {
+    font: 600 15px var(--font-ui);
+    color: var(--text-hi);
   }
   .close {
-    width: 22px;
-    height: 16px;
+    width: 26px;
+    height: 22px;
     border: none;
-    border-radius: 3px;
-    background: var(--btn-face);
-    box-shadow: inset 0 1px 0 var(--btn-top), 0 2px 3px rgba(0, 0, 0, 0.5);
-    display: grid;
-    place-items: center;
-    color: var(--text-mut);
-    font: 600 10px var(--font-ui);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-dim);
+    font: 500 15px var(--font-ui);
     cursor: pointer;
     padding: 0;
   }
+  .close:hover {
+    background: var(--btn-bg);
+    color: var(--text-hi);
+  }
   .body {
-    padding: 18px 20px 0;
+    padding: 16px 18px 0;
   }
   .foot {
     display: flex;
     justify-content: flex-end;
-    padding: 16px 20px 0;
-  }
-  .foot :global(button) {
-    min-width: 140px;
+    padding: 16px 18px;
   }
 </style>

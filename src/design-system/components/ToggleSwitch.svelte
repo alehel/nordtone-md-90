@@ -1,6 +1,6 @@
 <script lang="ts">
-  export let left = 'LOCAL';
-  export let right = 'ELEVENLABS';
+  export let left = 'Local';
+  export let right = 'ElevenLabs';
   /** true = right position */
   export let value = true;
 </script>
@@ -23,40 +23,43 @@
   .row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 9px;
   }
   .lab {
-    font: 500 11px var(--font-label);
-    letter-spacing: 1.5px;
-    color: var(--text-mut3);
+    font: 500 13px var(--font-ui);
+    color: var(--text-dim);
   }
   .lit {
-    color: var(--btn-active-fg);
-    text-shadow: 0 0 8px var(--accent-glow);
+    color: var(--selected-fg);
+    font-weight: 600;
   }
   .well {
     position: relative;
-    width: 52px;
-    height: 24px;
-    border: none;
-    border-radius: 12px;
-    background: var(--switch-well);
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.07);
+    width: 42px;
+    height: 22px;
+    border: 1px solid var(--field-border);
+    border-radius: 11px;
+    background: var(--field-bg);
     cursor: pointer;
     padding: 0;
+  }
+  .well:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--focus-ring);
   }
   .knob {
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: var(--switch-knob);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transition: left 0.15s;
+    background: var(--text-mut);
+    transition: left 0.15s, background 0.15s;
   }
   .knob.right {
-    left: 30px;
+    left: 22px;
+    background: var(--accent);
   }
 </style>

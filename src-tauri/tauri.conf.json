@@ -13,9 +13,9 @@
     "windows": [
       {
         "title": "NORDTONE MD-90",
-        "width": 1008,
-        "height": 910,
-        "minWidth": 1008,
+        "width": 1010,
+        "height": 880,
+        "minWidth": 1010,
         "minHeight": 720,
         "decorations": false,
         "center": true
