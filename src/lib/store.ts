@@ -10,9 +10,11 @@ import {
   HOST_PRESETS,
   MONTHS,
   VOICES,
+  TTS_ENGINES,
   type TapeId,
   type HostPresetId,
   type TalkLevel,
+  type TtsEngineId,
 } from './mock';
 
 export type Screen = 'setup' | 'generation' | 'jcard' | 'settings';
@@ -40,7 +42,6 @@ export const vibe = writable<string>('');
 export const tape = writable<TapeId | 'CUSTOM'>('C90');
 /** Total minutes for a CUSTOM tape (both sides). Real tapes ran 46–120. */
 export const customMinutes = writable<number>(74);
-export const premiumVoice = writable<boolean>(true);
 
 const AVG_TRACK_MIN = 3.75; // matches the design's C90 -> 24 tracks estimate
 
@@ -68,19 +69,21 @@ export const hostPreset = writable<HostPresetId | null>('warm');
 export const persona = writable<string>(HOST_PRESETS[0].persona);
 export const talkLevel = writable<TalkLevel>('Balanced');
 
-/* HOST VOICE — selection is remembered per engine, so toggling engines
-   doesn't lose your pick. Voice lists are engine-specific (§3.5). */
-export const localVoiceIdx = writable<number>(0);
-export const elevenVoiceIdx = writable<number>(0);
+/* HOST VOICE — engines are an open list (§3.5); selection is remembered per
+   engine, so switching engines doesn't lose your pick. */
+export const ttsEngine = writable<TtsEngineId>('elevenlabs');
+export const voiceIdxByEngine = writable<Record<TtsEngineId, number>>({ local: 0, elevenlabs: 0 });
 
-export const currentVoice = derived(
-  [premiumVoice, localVoiceIdx, elevenVoiceIdx],
-  ([premium, li, ei]) => {
-    const list = premium ? VOICES.elevenlabs : VOICES.local;
-    const idx = (((premium ? ei : li) % list.length) + list.length) % list.length;
-    return { ...list[idx], engine: premium ? 'ElevenLabs' : 'Local', idx, count: list.length };
-  },
-);
+export const currentVoice = derived([ttsEngine, voiceIdxByEngine], ([engine, sel]) => {
+  const list = VOICES[engine];
+  const idx = ((sel[engine] % list.length) + list.length) % list.length;
+  const engineLabel = TTS_ENGINES.find((e) => e.id === engine)?.label ?? engine;
+  return { ...list[idx], engine, engineLabel, idx, count: list.length };
+});
+
+export function pickVoiceIdx(idx: number): void {
+  voiceIdxByEngine.update((sel) => ({ ...sel, [get(ttsEngine)]: idx }));
+}
 
 /* SHOW CLOCK (§3.5) — when the show was recorded. Used in the host's intro,
    to filter track selection to music released by then, to period-lock the

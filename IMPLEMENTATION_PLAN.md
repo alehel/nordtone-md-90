@@ -159,7 +159,7 @@ TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*.
 - The main view stays stable: controls can be added, removed, or reorganized inside an editor without rebalancing the faceplate layout every time.
 - Editor contents can be **dynamic**: options adapt to context — the SHOW FORMAT editor already holds the host-voice engine toggle (LOCAL/ELEVENLABS) alongside the persona controls, so engine-specific voice options appear right there, and future provider-specific knobs follow the same pattern without touching the main screen.
 
-**Voice selection & preview.** The HOST VOICE row in the SHOW FORMAT editor is a tuner: engine toggle (LOCAL/ELEVENLABS), ◂ ▸ keys stepping through the current engine's voices on an LCD readout, and a **▶ PREVIEW** key. Selection is remembered per engine. The voice *lists* are engine-specific and populated in Phase 4: LOCAL shows the Piper voice models installed on the machine (models are downloaded/managed in **Settings → local voice management**); ELEVENLABS shows the voices fetched from the user's own account via their API key (including their cloned/custom voices). PREVIEW renders one short sample line in the selected voice — spoken in the current host persona so the user hears the actual show host, not a generic demo — cached per voice+persona so repeat previews are instant and (for ElevenLabs) don't re-bill.
+**Voice selection & preview.** The SHOW FORMAT editor has two dropdowns plus a preview: **Voice service** (an *open engine list* — Local/Piper and ElevenLabs today; additional TTS providers slot in as new entries with no UI changes) and **Host voice** (the selected engine's voices), with a **▶ Preview** button. Selection is remembered per engine. Voice lists are engine-specific and populated in Phase 4: Local shows the Piper voice models installed on the machine (models are downloaded/managed in **Settings → local voice management**); ElevenLabs shows the voices fetched from the user's own account via their API key (including their cloned/custom voices). Preview renders one short sample line in the selected voice — spoken in the current host persona so the user hears the actual show host, not a generic demo — cached per voice+persona so repeat previews are instant and (for paid engines) don't re-bill.
 
 **CUSTOM tape length.** Alongside C60/C90/C120, a fourth CUSTOM key opens a popup where the user sets the total tape length themselves (10–240 min, both sides combined — e.g. a real C74). The custom length flows through everything a preset would: per-side readout, track estimate, tape counter, and the J-card label.
 
@@ -189,7 +189,8 @@ TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*.
 │  ├─ selection  via `ai`: pick + sequence tracks to fit side   │
 │  ├─ script     via `ai`: DJ script (cold open, links, flip    │
 │  │             reminder, sign-off) → timed segments           │
-│  ├─ tts        Piper (local, bundled) | ElevenLabs (HTTP)     │
+│  ├─ tts        engine trait: Piper (local) | ElevenLabs |    │
+│  │             future providers plug in                      │
 │  ├─ mix        decode → LUFS-normalize → crossfade → duck →   │
 │  │             fit-to-side → WAV encode  (per side)           │
 │  ├─ jcard      render J-card → PDF / print                    │
@@ -218,7 +219,7 @@ TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*.
 | WAV encode | `hound` |
 | Library index DB | `rusqlite` (bundled SQLite) or `sqlx` |
 | LLM client (multi-provider) | `genai` — one chat API across Anthropic, OpenAI, Gemini, Groq, xAI, DeepSeek, Cohere, and Ollama (local models); supports streaming and structured/JSON output. Custom OpenAI-compatible base URLs cover self-hosted/other providers. |
-| Local TTS | **Piper** (bundled binary + voice model) invoked as a sidecar, or `sherpa-rs` bindings |
+| TTS | An **engine trait** with two v1 implementations — **Piper** (bundled binary + voice model, sidecar) and **ElevenLabs** (HTTP) — so further providers (e.g. OpenAI TTS, Kokoro) are additive |
 | Secret storage | `keyring` (macOS Keychain / Windows Credential Manager / libsecret) |
 | PDF (fallback path) | `printpdf` or Typst; primary path is webview print-to-PDF |
 | Async orchestration | `tokio` + cancellation tokens |

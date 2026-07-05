@@ -14,9 +14,8 @@
     tape,
     customMinutes,
     tapeInfo,
-    premiumVoice,
-    localVoiceIdx,
-    elevenVoiceIdx,
+    ttsEngine,
+    pickVoiceIdx,
     hostPreset,
     persona,
     talkLevel,
@@ -30,7 +29,19 @@
     startCompose,
     openSettings,
   } from '../lib/store';
-  import { LIBRARY, DEFAULT_VIBE, VIBE_CHIPS, SHOW_TITLE, TAPES, HOST_PRESETS, TALK_LEVELS, VOICES, MONTHS } from '../lib/mock';
+  import {
+    LIBRARY,
+    DEFAULT_VIBE,
+    VIBE_CHIPS,
+    SHOW_TITLE,
+    TAPES,
+    HOST_PRESETS,
+    TALK_LEVELS,
+    VOICES,
+    TTS_ENGINES,
+    MONTHS,
+    type TtsEngineId,
+  } from '../lib/mock';
 
   if (!$vibe) vibe.set(DEFAULT_VIBE);
 
@@ -50,10 +61,12 @@
     talkLevel.set(id as (typeof TALK_LEVELS)[number]);
   }
 
-  $: voiceList = $premiumVoice ? VOICES.elevenlabs : VOICES.local;
+  $: voiceList = VOICES[$ttsEngine];
+  function pickEngine(e: Event) {
+    ttsEngine.set((e.currentTarget as HTMLSelectElement).value as TtsEngineId);
+  }
   function pickVoice(e: Event) {
-    const idx = Number((e.currentTarget as HTMLSelectElement).value);
-    ($premiumVoice ? elevenVoiceIdx : localVoiceIdx).set(idx);
+    pickVoiceIdx(Number((e.currentTarget as HTMLSelectElement).value));
   }
 
   // Mock voice preview: Phase 4 replaces the timer with real TTS playback.
@@ -100,7 +113,7 @@
       <InsetPanel label="The show">
         <div class="show-sum">
           Host: <b>{presetLabel}</b> — {$persona} · Talk: {$talkLevel}<br />
-          Voice: {$currentVoice.engine} · {$currentVoice.label} · Recorded: {$clockLabel}
+          Voice: {$currentVoice.engineLabel} · {$currentVoice.label} · Recorded: {$clockLabel}
         </div>
         <div class="show-edit">
           <HardwareButton on:click={() => editor.set('format')}>Edit show format…</HardwareButton>
@@ -152,19 +165,28 @@
     </div>
 
     <div class="frow divider">
-      <div>
-        <div class="label-line">Host voice</div>
-        <ToggleSwitch bind:value={$premiumVoice} />
-      </div>
-      <div class="voice-pick">
-        <select class="input" value={String($currentVoice.idx)} on:change={pickVoice} aria-label="Voice">
-          {#each voiceList as v, i}
-            <option value={String(i)}>{v.label}</option>
-          {/each}
-        </select>
-        <HardwareButton active={previewing} on:click={previewVoice}>
-          {previewing ? 'Playing…' : '▶ Preview'}
-        </HardwareButton>
+      <div class="voice-grid">
+        <div>
+          <div class="label-line">Voice service</div>
+          <select class="input" value={$ttsEngine} on:change={pickEngine} aria-label="Voice service">
+            {#each TTS_ENGINES as e}
+              <option value={e.id}>{e.label}</option>
+            {/each}
+          </select>
+        </div>
+        <div>
+          <div class="label-line">Host voice</div>
+          <div class="voice-pick">
+            <select class="input" value={String($currentVoice.idx)} on:change={pickVoice} aria-label="Voice">
+              {#each voiceList as v, i}
+                <option value={String(i)}>{v.label}</option>
+              {/each}
+            </select>
+            <HardwareButton active={previewing} on:click={previewVoice}>
+              {previewing ? 'Playing…' : '▶ Preview'}
+            </HardwareButton>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -298,6 +320,12 @@
   }
   .frow > div:first-child {
     flex: none;
+  }
+  .voice-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
   }
   .voice-pick,
   .clock-pick {

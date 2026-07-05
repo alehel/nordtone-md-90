@@ -35,10 +35,17 @@ export type HostPresetId = (typeof HOST_PRESETS)[number]['id'];
 export const TALK_LEVELS = ['Minimal', 'Balanced', 'Chatty'] as const;
 export type TalkLevel = (typeof TALK_LEVELS)[number];
 
-/** Voice lists are engine-specific (IMPLEMENTATION_PLAN §3.5): LOCAL = Piper
- * voice models installed via Settings; ELEVENLABS = voices fetched from the
+/** TTS engines are an open list (IMPLEMENTATION_PLAN §3.5) — more providers
+ * can be added without UI changes. Voice lists are engine-specific: local =
+ * Piper models installed via Settings; elevenlabs = voices fetched from the
  * user's account. Mocked until Phase 4. */
-export const VOICES = {
+export const TTS_ENGINES = [
+  { id: 'local', label: 'Local (Piper) — free' },
+  { id: 'elevenlabs', label: 'ElevenLabs' },
+] as const;
+export type TtsEngineId = (typeof TTS_ENGINES)[number]['id'];
+
+export const VOICES: Record<TtsEngineId, readonly { id: string; label: string }[]> = {
   local: [
     { id: 'nora', label: '"Nora" · clear & close' },
     { id: 'finn', label: '"Finn" · soft baritone' },
@@ -49,7 +56,7 @@ export const VOICES = {
     { id: 'bjorn', label: '"Bjørn" · deep late-night' },
     { id: 'liv', label: '"Liv" · crisp Top-40' },
   ],
-} as const;
+};
 
 export const MONTHS = [
   'January',
