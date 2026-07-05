@@ -55,10 +55,11 @@
       </InsetPanel>
 
       <InsetPanel label="SHOW FORMAT">
-        <div class="edit-row">
+        <div class="edit-row bottom">
           <Lcd grow>
             <span class="clamp two">{$persona}</span>
-            <span class="dim">{presetLabel} · TALK: {$talkLevel} · ERA NEWS: {$eraNews ? 'ON' : 'OFF'}</span>
+            <span class="dim">{presetLabel} · TALK: {$talkLevel} · ERA NEWS: {$eraNews ? 'ON' : 'OFF'}</span><br />
+            <span class="dim">VOICE: {$premiumVoice ? 'ELEVENLABS · "VESLA"' : 'LOCAL · "PIPER NB"'}</span>
           </Lcd>
           <HardwareButton on:click={() => editor.set('format')}>EDIT…</HardwareButton>
         </div>
@@ -67,22 +68,14 @@
 
     <div class="col">
       <CassetteBay title={SHOW_TITLE} spinning={false} />
-      <div class="pair">
-        <InsetPanel label="TAPE LENGTH">
-          <div class="tapes">
-            {#each TAPES as t}
-              <HardwareButton active={$tape === t.id} on:click={() => tape.set(t.id)}>{t.id}</HardwareButton>
-            {/each}
-          </div>
-          <div class="readout"><Lcd size="md" center>{selected.perSide} PER SIDE</Lcd></div>
-        </InsetPanel>
-        <InsetPanel label="HOST VOICE">
-          <ToggleSwitch bind:value={$premiumVoice} />
-          <div class="readout">
-            <Lcd size="md" center>{$premiumVoice ? '"VESLA" · WARM FM' : 'LOCAL · "PIPER NB"'}</Lcd>
-          </div>
-        </InsetPanel>
-      </div>
+      <InsetPanel label="TAPE LENGTH">
+        <div class="tapes">
+          {#each TAPES as t}
+            <HardwareButton active={$tape === t.id} on:click={() => tape.set(t.id)}>{t.id}</HardwareButton>
+          {/each}
+        </div>
+        <div class="readout"><Lcd size="md" center>{selected.perSide} PER SIDE</Lcd></div>
+      </InsetPanel>
     </div>
   </div>
 
@@ -141,6 +134,13 @@
         <ToggleSwitch left="OFF" right="ON" bind:value={$eraNews} />
       </div>
     </div>
+    <div class="voice-row">
+      <div>
+        <div class="field-label">HOST VOICE</div>
+        <ToggleSwitch bind:value={$premiumVoice} />
+      </div>
+      <Lcd size="md" grow center>{$premiumVoice ? '"VESLA" · WARM FM' : 'LOCAL · "PIPER NB"'}</Lcd>
+    </div>
   </ModalWindow>
 {/if}
 
@@ -173,8 +173,9 @@
     flex: 1;
     align-items: stretch;
   }
-  .edit-row.grow :global(button) {
-    align-self: center;
+  .edit-row.grow :global(button),
+  .edit-row.bottom :global(button) {
+    align-self: flex-end;
   }
   .clamp {
     display: -webkit-box;
@@ -186,11 +187,6 @@
   .clamp.two {
     -webkit-line-clamp: 2;
     line-clamp: 2;
-  }
-  .pair {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
   }
   .tapes {
     display: flex;
@@ -278,5 +274,14 @@
   .talk :global(button) {
     padding: 7px 10px;
     font-size: 12px;
+  }
+  .voice-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: var(--chrome-divider);
+    box-shadow: var(--chrome-divider-glow);
   }
 </style>
