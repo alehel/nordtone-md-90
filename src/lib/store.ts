@@ -71,8 +71,9 @@ export const talkLevel = writable<TalkLevel>('BALANCED');
 export const editor = writable<'music' | 'format' | 'tape' | null>(null);
 
 /* SHOW CLOCK (§3.5) — when the show was recorded. Used in the host's intro,
-   to filter track selection to music released by then, and as the J-card
-   date. TODAY (off) means the real date and the whole library is eligible. */
+   to filter track selection to music released by then, to period-lock the
+   host's life tidbits (no smartphones in 1989), and as the J-card date.
+   TODAY (off) means the real date and the whole library is eligible. */
 export const clockSet = writable<boolean>(false);
 export const clockYear = writable<number>(1985);
 /** 0–11, or null for "year only". */
