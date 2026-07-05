@@ -66,14 +66,13 @@ export const tapeInfo = derived([tape, customMinutes], ([t, mins]) => {
 export const hostPreset = writable<HostPresetId | null>('warm');
 export const persona = writable<string>(HOST_PRESETS[0].persona);
 export const talkLevel = writable<TalkLevel>('BALANCED');
-export const eraNews = writable<boolean>(true);
 
 /** Which editor window is open on the Setup faceplate. */
 export const editor = writable<'music' | 'format' | 'tape' | null>(null);
 
-/* SHOW CLOCK (§3.5) — when the show pretends to be live. TODAY (off) prints
-   the real date on the J-card and lets era news follow the music; SET pins a
-   fictional broadcast time the host speaks from. */
+/* SHOW CLOCK (§3.5) — when the show was recorded. Used in the host's intro,
+   to filter track selection to music released by then, and as the J-card
+   date. TODAY (off) means the real date and the whole library is eligible. */
 export const clockSet = writable<boolean>(false);
 export const clockYear = writable<number>(1985);
 /** 0–11, or null for "year only". */

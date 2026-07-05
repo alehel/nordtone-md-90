@@ -26,7 +26,7 @@ This plan translates the Claude Design handoff (`project/NORDTONE MD-90.html`, s
 4. **Choose a host voice** — a free local voice by default, or a premium ElevenLabs voice.
 5. **Compose** (the red REC button):
    - The user's chosen LLM **selects and sequences** tracks from the library to match the vibe and fit each side.
-   - The LLM **writes a DJ script** — cold open, inter-song links with artist stories, era news items, a "flip the tape" reminder at the end of Side A, and a Side B sign-off.
+   - The LLM **writes a DJ script** — cold open, inter-song links with artist stories and little tidbits from the host's own (fictional) life, a "flip the tape" reminder at the end of Side A, and a Side B sign-off. The host **never does news or current affairs** — see the content principle in §3.5.
    - The script is **voiced** (local TTS or ElevenLabs).
    - Everything is **mixed with radio craft**: consistent loudness (−16 LUFS), crossfades, and the host talking over song intros with the music **ducked** underneath.
 6. **Output**: two audio files, `side-a.wav` and `side-b.wav`, each fitted precisely to the tape side.
@@ -93,7 +93,7 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 - `StageList` — the PROGRESS SEQUENCE rows (LED + label + VT323 status) for the five generation stages.
 - `TransportStrip` — bottom bar: status LCD + primary action button (REC / STOP / PRINT). *(The design's VU meters were dropped — see §3.5.)*
 - `ModalWindow` — a smaller hardware module overlaying the dimmed faceplate: label header, × close key, DONE key. Hosts the editor windows (§3.5).
-- `ShowFormat` — the granular show-definition controls (§3.5): host-personality preset keys with a persona LCD readout, talk-amount selector, era-news toggle. Lives inside an editor window.
+- `ShowFormat` — the granular show-definition controls (§3.5): host-personality preset keys with a persona LCD readout, talk-amount selector, host voice, show clock. Lives inside an editor window.
 - `JCard` — the unfolded, print-scaled inlay (front art panel, dashed fold + spine, two-column tracklist flap, credits). The mockup's credit line ("SCRIPT BY CLAUDE") is rendered dynamically from the configured provider/model — e.g. "SCRIPT BY GPT-4O" or "SCRIPT BY LLAMA 3 (LOCAL)".
 
 ### 3.3 Screens
@@ -139,8 +139,9 @@ Two changes were decided after the handoff and supersede the mockups:
 
 - **HOST PERSONALITY** — one-press preset keys, each mapping to a persona description shown on an LCD readout: e.g. *WARM FM* ("warm, unhurried, stories between songs"), *TOP-40 HYPE* ("fast, bright, countdown energy"), *DRY WIT* ("laconic, deadpan, one-liners"), *MIDNIGHT JAZZ* ("velvet, slow, after-hours"). The persona line is editable text; editing it releases the preset key.
 - **TALK AMOUNT** — MINIMAL / BALANCED / CHATTY, controlling link frequency and length (and feeding the fit solver's time budget for speech).
-- **ERA NEWS** — on/off toggle for the "news items from the era of the music" segments.
-- **SHOW CLOCK** — *when the show pretends to be live.* TODAY (default): the J-card prints the real recording date and era news follows the music. SET: pick a year (optionally month + year) — the host broadcasts as if live then ("it's March 1985"), era news pulls from that time, and the J-card prints it as the recording date.
+- **SHOW CLOCK** — *when the show was recorded.* TODAY (default) or a set year (optionally month + year). The date is used three ways: the host can reference it in the intro, **track selection is filtered to music released by then** (no anachronisms on a 1985 tape), and it prints on the J-card as the recording date.
+
+**Content principle — no news, by design.** The original design included "era news" segments; they were cut deliberately. News risks injecting controversial real-world events or handing the presenter controversial opinions. The host talks about exactly two things: **the music being played** (artists, stories behind the songs) and **interesting tidbits from their own fictional life**. No news, no current affairs, no commentary on real events. This is enforced in the script-writing system prompt (§6), not left to model discretion.
 
 TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*. Both are merged by the prompt builder, so a novice gets a great show having typed nothing but a genre, while a prompter can write exactly what they want in either field.
 
@@ -171,8 +172,8 @@ TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*.
 │  ├─ ai         provider-agnostic LLM client (genai): user-    │
 │  │             selected provider/model, streaming, retries    │
 │  ├─ selection  via `ai`: pick + sequence tracks to fit side   │
-│  ├─ script     via `ai`: DJ script (cold open, links, news,   │
-│  │             flip reminder, sign-off) → timed segments      │
+│  ├─ script     via `ai`: DJ script (cold open, links, flip    │
+│  │             reminder, sign-off) → timed segments           │
 │  ├─ tts        Piper (local, bundled) | ElevenLabs (HTTP)     │
 │  ├─ mix        decode → LUFS-normalize → crossfade → duck →   │
 │  │             fit-to-side → WAV encode  (per side)           │
@@ -238,12 +239,12 @@ All LLM access goes through a single `ai` module built on the **`genai`** crate,
 
 The `ai` module owns provider/model config, key retrieval from the keychain, streaming, retries/backoff, and a **capability shim**: structured output is requested via native JSON mode where the provider supports it, and falls back to prompt-enforced JSON + parse-and-repair where it doesn't, so both calls below behave identically on every provider. A "test connection" action in Settings validates the chosen provider/model before composing.
 
-A **prompt builder** sits in front of both calls: it merges the free-text TONIGHT'S MUSIC field with the structured SHOW FORMAT settings (§3.5 — host persona, talk amount, era news, show clock) into the system/user prompts, so casual users get well-formed prompts without writing them, and user-written text is always passed through verbatim (§3.5's "presets assist, free text wins"). Talk amount also sets the speech-time budget handed to the fit solver.
+A **prompt builder** sits in front of both calls: it merges the free-text TONIGHT'S MUSIC field with the structured SHOW FORMAT settings (§3.5 — host persona, talk amount, show clock) into the system/user prompts, so casual users get well-formed prompts without writing them, and user-written text is always passed through verbatim (§3.5's "presets assist, free text wins"). Talk amount also sets the speech-time budget handed to the fit solver.
 
 Two distinct LLM calls, both using the user's configured provider:
 
-1. **Track selection & sequencing.** Input: the vibe prompt + a compact digest of the indexed library (artist, title, duration, tags/features) + target side length and count. Output (via **structured JSON** through the capability shim): an ordered tracklist per side with durations that fit, plus where host links go. Model must respect the total-time budget; the app validates and, if over/under, re-prompts or applies the fit solver in §5.6.
-2. **DJ script writing.** Input: the chosen sequence + era/artist context. Output: timed script segments — cold open, inter-song links (artist stories, era news), the **Side A flip reminder**, and the **Side B sign-off** — each tagged with which track it precedes/overlaps and an estimated spoken duration. **Stream** the response so the SCRIPT MONITOR fills live (matches the design's streaming LCD + blinking cursor).
+1. **Track selection & sequencing.** Input: the music prompt + a compact digest of the indexed library (artist, title, duration, release year, tags/features) + target side length and count. When the SHOW CLOCK is set, the digest is **pre-filtered to tracks released on or before it** (release year from tags; unknown-year tracks configurable, default excluded) — the filter is applied in code, not entrusted to the model. Output (via **structured JSON** through the capability shim): an ordered tracklist per side with durations that fit, plus where host links go. Model must respect the total-time budget; the app validates and, if over/under, re-prompts or applies the fit solver in §5.6.
+2. **DJ script writing.** Input: the chosen sequence + artist context + the show clock (for the intro). Output: timed script segments — cold open, inter-song links (artist stories, tidbits from the host's own life), the **Side A flip reminder**, and the **Side B sign-off** — each tagged with which track it precedes/overlaps and an estimated spoken duration. The system prompt **hard-constrains the host's subject matter** to the music and their own fictional life per §3.5's content principle — no news, current affairs, or opinions on real events. **Stream** the response so the SCRIPT MONITOR fills live (matches the design's streaming LCD + blinking cursor).
 
 Spoken-duration estimates feed back into the fit solver so voice + music together still fit the side.
 

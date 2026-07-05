@@ -19,7 +19,6 @@
     hostPreset,
     persona,
     talkLevel,
-    eraNews,
     clockSet,
     clockYear,
     clockMonth,
@@ -73,7 +72,7 @@
         <div class="summary">
           <Lcd>
             <span class="clamp two">{$persona}</span>
-            <span class="dim">{presetLabel} · TALK: {$talkLevel} · ERA NEWS: {$eraNews ? 'ON' : 'OFF'}</span><br />
+            <span class="dim">{presetLabel} · TALK: {$talkLevel}</span><br />
             <span class="dim">
               VOICE: {$premiumVoice ? 'ELEVENLABS · "VESLA"' : 'LOCAL · "PIPER NB"'}{$clockSet
                 ? ` · CLOCK: ${$clockLabel}`
@@ -159,10 +158,6 @@
           {/each}
         </div>
       </div>
-      <div>
-        <div class="field-label">ERA NEWS</div>
-        <ToggleSwitch left="OFF" right="ON" bind:value={$eraNews} />
-      </div>
     </div>
     <div class="voice-row">
       <div>
@@ -185,7 +180,7 @@
           <HardwareButton on:click={() => clockYear.update((y) => Math.min(2100, y + 1))}>+1</HardwareButton>
         </div>
       {:else}
-        <Lcd size="md" grow center><span class="dim">BROADCASTS AS LIVE TODAY · ERA NEWS FOLLOWS THE MUSIC</span></Lcd>
+        <Lcd size="md" grow center><span class="dim">RECORDED TODAY · WHOLE LIBRARY ELIGIBLE</span></Lcd>
       {/if}
     </div>
   </ModalWindow>

@@ -61,7 +61,7 @@ export const SIDE_A: Track[] = [
 ];
 
 export const SIDE_B: Track[] = [
-  { n: '01', title: 'Welcome back — news from 1984', dur: '0:58' },
+  { n: '01', title: 'Welcome back — a word from Vesla', dur: '0:58' },
   { n: '02', title: "Talk Talk — It's My Life", dur: '3:52' },
   { n: '03', title: 'Ultravox — Vienna', dur: '4:36' },
   { n: '04', title: 'Eurythmics — Here Comes the Rain Again', dur: '3:55' },
