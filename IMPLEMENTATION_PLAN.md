@@ -140,6 +140,7 @@ Two changes were decided after the handoff and supersede the mockups:
 - **HOST PERSONALITY** — one-press preset keys, each mapping to a persona description shown on an LCD readout: e.g. *WARM FM* ("warm, unhurried, stories between songs"), *TOP-40 HYPE* ("fast, bright, countdown energy"), *DRY WIT* ("laconic, deadpan, one-liners"), *MIDNIGHT JAZZ* ("velvet, slow, after-hours"). The persona line is editable text; editing it releases the preset key.
 - **TALK AMOUNT** — MINIMAL / BALANCED / CHATTY, controlling link frequency and length (and feeding the fit solver's time budget for speech).
 - **ERA NEWS** — on/off toggle for the "news items from the era of the music" segments.
+- **SHOW CLOCK** — *when the show pretends to be live.* TODAY (default): the J-card prints the real recording date and era news follows the music. SET: pick a year (optionally month + year) — the host broadcasts as if live then ("it's March 1985"), era news pulls from that time, and the J-card prints it as the recording date.
 
 TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*. Both are merged by the prompt builder, so a novice gets a great show having typed nothing but a genre, while a prompter can write exactly what they want in either field.
 
@@ -237,7 +238,7 @@ All LLM access goes through a single `ai` module built on the **`genai`** crate,
 
 The `ai` module owns provider/model config, key retrieval from the keychain, streaming, retries/backoff, and a **capability shim**: structured output is requested via native JSON mode where the provider supports it, and falls back to prompt-enforced JSON + parse-and-repair where it doesn't, so both calls below behave identically on every provider. A "test connection" action in Settings validates the chosen provider/model before composing.
 
-A **prompt builder** sits in front of both calls: it merges the free-text TONIGHT'S MUSIC field with the structured SHOW FORMAT settings (§3.5 — host persona, talk amount, era news) into the system/user prompts, so casual users get well-formed prompts without writing them, and user-written text is always passed through verbatim (§3.5's "presets assist, free text wins"). Talk amount also sets the speech-time budget handed to the fit solver.
+A **prompt builder** sits in front of both calls: it merges the free-text TONIGHT'S MUSIC field with the structured SHOW FORMAT settings (§3.5 — host persona, talk amount, era news, show clock) into the system/user prompts, so casual users get well-formed prompts without writing them, and user-written text is always passed through verbatim (§3.5's "presets assist, free text wins"). Talk amount also sets the speech-time budget handed to the fit solver.
 
 Two distinct LLM calls, both using the user's configured provider:
 

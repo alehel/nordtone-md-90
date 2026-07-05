@@ -5,8 +5,18 @@
   import Lcd from '../design-system/components/Lcd.svelte';
   import HardwareButton from '../design-system/components/HardwareButton.svelte';
   import JCard from '../design-system/components/JCard.svelte';
-  import { newShow, openSettings, tapeInfo } from '../lib/store';
+  import { newShow, openSettings, tapeInfo, clockSet, clockLabel } from '../lib/store';
   import { SIDE_A, SIDE_B, FIT_REPORT } from '../lib/mock';
+
+  const now = new Date();
+  const todayLabel = [
+    String(now.getDate()).padStart(2, '0'),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    now.getFullYear(),
+  ].join('.');
+  // The J-card prints the show's recording date: the SHOW CLOCK when set,
+  // otherwise the real date.
+  $: dateLabel = $clockSet ? $clockLabel : todayLabel;
 </script>
 
 <Panel>
@@ -20,6 +30,7 @@
         durA={FIT_REPORT.sideA.dur}
         durB={FIT_REPORT.sideB.dur}
         tapeLabel={$tapeInfo.label}
+        date={dateLabel}
       />
     </div>
 

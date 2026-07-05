@@ -25,6 +25,21 @@ export type HostPresetId = (typeof HOST_PRESETS)[number]['id'];
 export const TALK_LEVELS = ['MINIMAL', 'BALANCED', 'CHATTY'] as const;
 export type TalkLevel = (typeof TALK_LEVELS)[number];
 
+export const MONTHS = [
+  'JANUARY',
+  'FEBRUARY',
+  'MARCH',
+  'APRIL',
+  'MAY',
+  'JUNE',
+  'JULY',
+  'AUGUST',
+  'SEPTEMBER',
+  'OCTOBER',
+  'NOVEMBER',
+  'DECEMBER',
+] as const;
+
 export const SHOW_TITLE = 'Neon Rain Drivetime';
 
 export const TAPES = [

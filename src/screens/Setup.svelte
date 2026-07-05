@@ -20,6 +20,10 @@
     persona,
     talkLevel,
     eraNews,
+    clockSet,
+    clockYear,
+    clockMonth,
+    clockLabel,
     editor,
     applyHostPreset,
     startCompose,
@@ -33,6 +37,14 @@
     hostPreset.set(null);
   }
   $: presetLabel = HOST_PRESETS.find((p) => p.id === $hostPreset)?.label ?? 'CUSTOM HOST';
+
+  // Month steps cycle: year-only -> JAN ... DEC -> year-only.
+  function stepMonth(dir: 1 | -1) {
+    clockMonth.update((m) => {
+      const next = (m === null ? (dir === 1 ? 0 : 11) : m + dir);
+      return next < 0 || next > 11 ? null : next;
+    });
+  }
 </script>
 
 <Panel>
@@ -62,7 +74,11 @@
           <Lcd>
             <span class="clamp two">{$persona}</span>
             <span class="dim">{presetLabel} · TALK: {$talkLevel} · ERA NEWS: {$eraNews ? 'ON' : 'OFF'}</span><br />
-            <span class="dim">VOICE: {$premiumVoice ? 'ELEVENLABS · "VESLA"' : 'LOCAL · "PIPER NB"'}</span>
+            <span class="dim">
+              VOICE: {$premiumVoice ? 'ELEVENLABS · "VESLA"' : 'LOCAL · "PIPER NB"'}{$clockSet
+                ? ` · CLOCK: ${$clockLabel}`
+                : ''}
+            </span>
           </Lcd>
           <div class="edit-line">
             <HardwareButton on:click={() => editor.set('format')}>EDIT…</HardwareButton>
@@ -154,6 +170,23 @@
         <ToggleSwitch bind:value={$premiumVoice} />
       </div>
       <Lcd size="md" grow center>{$premiumVoice ? '"VESLA" · WARM FM' : 'LOCAL · "PIPER NB"'}</Lcd>
+    </div>
+    <div class="voice-row">
+      <div>
+        <div class="field-label">SHOW CLOCK</div>
+        <ToggleSwitch left="TODAY" right="SET" bind:value={$clockSet} />
+      </div>
+      {#if $clockSet}
+        <div class="clock-ctl">
+          <HardwareButton on:click={() => stepMonth(-1)}>◂</HardwareButton>
+          <HardwareButton on:click={() => stepMonth(1)}>▸</HardwareButton>
+          <Lcd size="md" grow center>{$clockLabel}</Lcd>
+          <HardwareButton on:click={() => clockYear.update((y) => Math.max(1900, y - 1))}>−1</HardwareButton>
+          <HardwareButton on:click={() => clockYear.update((y) => Math.min(2100, y + 1))}>+1</HardwareButton>
+        </div>
+      {:else}
+        <Lcd size="md" grow center><span class="dim">BROADCASTS AS LIVE TODAY · ERA NEWS FOLLOWS THE MUSIC</span></Lcd>
+      {/if}
     </div>
   </ModalWindow>
 {/if}
@@ -325,6 +358,15 @@
     display: flex;
     gap: 8px;
     align-items: stretch;
+  }
+  .clock-ctl {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .clock-ctl :global(button) {
+    padding: 7px 12px;
   }
   .min-well {
     flex: 1;

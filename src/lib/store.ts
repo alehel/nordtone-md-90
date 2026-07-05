@@ -4,7 +4,15 @@
  * replaces the timers with real backend job events over Tauri IPC.
  */
 import { writable, derived, get } from 'svelte/store';
-import { SCRIPT_TEXT, NOW_FITTING, HOST_PRESETS, type TapeId, type HostPresetId, type TalkLevel } from './mock';
+import {
+  SCRIPT_TEXT,
+  NOW_FITTING,
+  HOST_PRESETS,
+  MONTHS,
+  type TapeId,
+  type HostPresetId,
+  type TalkLevel,
+} from './mock';
 
 export type Screen = 'setup' | 'generation' | 'jcard' | 'settings';
 
@@ -62,6 +70,20 @@ export const eraNews = writable<boolean>(true);
 
 /** Which editor window is open on the Setup faceplate. */
 export const editor = writable<'music' | 'format' | 'tape' | null>(null);
+
+/* SHOW CLOCK (§3.5) — when the show pretends to be live. TODAY (off) prints
+   the real date on the J-card and lets era news follow the music; SET pins a
+   fictional broadcast time the host speaks from. */
+export const clockSet = writable<boolean>(false);
+export const clockYear = writable<number>(1985);
+/** 0–11, or null for "year only". */
+export const clockMonth = writable<number | null>(null);
+
+export const clockLabel = derived([clockSet, clockYear, clockMonth], ([on, y, m]) => {
+  if (!on) return 'TODAY';
+  const year = Math.min(2100, Math.max(1900, Math.round(Number(y) || 1985)));
+  return m === null ? String(year) : `${MONTHS[m]} ${year}`;
+});
 
 export function applyHostPreset(id: HostPresetId): void {
   hostPreset.set(id);
