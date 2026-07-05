@@ -28,8 +28,28 @@ export function closeSettings(): void {
 }
 
 export const vibe = writable<string>('');
-export const tape = writable<TapeId>('C90');
+export const tape = writable<TapeId | 'CUSTOM'>('C90');
+/** Total minutes for a CUSTOM tape (both sides). Real tapes ran 46–120. */
+export const customMinutes = writable<number>(74);
 export const premiumVoice = writable<boolean>(true);
+
+const AVG_TRACK_MIN = 3.75; // matches the design's C90 -> 24 tracks estimate
+
+const fmt = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`;
+
+/** Resolved tape selection: label, per-side length, track estimate. */
+export const tapeInfo = derived([tape, customMinutes], ([t, mins]) => {
+  // Typed input can be transiently empty/out of range — clamp, don't trust.
+  const total = t === 'CUSTOM' ? Math.min(240, Math.max(10, Math.round(Number(mins) || 74))) : Number(t.slice(1));
+  const perSideSec = (total * 60) / 2;
+  return {
+    label: `C${total}`,
+    totalMin: total,
+    perSideSec,
+    perSide: fmt(perSideSec),
+    est: Math.max(1, Math.round(total / AVG_TRACK_MIN)),
+  };
+});
 
 /* SHOW FORMAT (§3.5) — structured show-definition settings that the Phase 3
    prompt builder merges with the free-text music description. Presets only
@@ -41,7 +61,7 @@ export const talkLevel = writable<TalkLevel>('BALANCED');
 export const eraNews = writable<boolean>(true);
 
 /** Which editor window is open on the Setup faceplate. */
-export const editor = writable<'music' | 'format' | null>(null);
+export const editor = writable<'music' | 'format' | 'tape' | null>(null);
 
 export function applyHostPreset(id: HostPresetId): void {
   hostPreset.set(id);
@@ -64,8 +84,8 @@ export const nowFitting = writable<string>(NOW_FITTING[0]);
 
 export const counterLabel = derived([counterSec, sideLenSec], ([sec, len]) => {
   const f = (s: number) =>
-    `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-  return { elapsed: f(sec), total: `${Math.floor(len / 60)}:00`, pct: Math.min(100, (sec / len) * 100) };
+    `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  return { elapsed: f(sec), total: fmt(len), pct: Math.min(100, (sec / len) * 100) };
 });
 
 let timers: ReturnType<typeof setInterval | typeof setTimeout>[] = [];
@@ -85,6 +105,7 @@ export function startCompose(): void {
   stages.set(IDLE_STAGES.map((s) => ({ ...s })));
   scriptText.set('');
   counterSec.set(0);
+  sideLenSec.set(get(tapeInfo).perSideSec);
   screen.set('generation');
 
   setStage(0, 'busy', 'reading tags…');

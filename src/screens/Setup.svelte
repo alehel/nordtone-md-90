@@ -13,6 +13,8 @@
   import {
     vibe,
     tape,
+    customMinutes,
+    tapeInfo,
     premiumVoice,
     hostPreset,
     persona,
@@ -26,7 +28,6 @@
   import { LIBRARY, DEFAULT_VIBE, VIBE_CHIPS, SHOW_TITLE, TAPES, HOST_PRESETS, TALK_LEVELS } from '../lib/mock';
 
   if (!$vibe) vibe.set(DEFAULT_VIBE);
-  $: selected = TAPES.find((t) => t.id === $tape) ?? TAPES[1];
   // Hand-editing the persona line releases the preset key — free text wins.
   $: if ($hostPreset && $persona !== HOST_PRESETS.find((p) => p.id === $hostPreset)?.persona) {
     hostPreset.set(null);
@@ -48,20 +49,24 @@
       </InsetPanel>
 
       <InsetPanel label="TONIGHT'S MUSIC" grow>
-        <div class="edit-row grow">
+        <div class="summary grow">
           <Lcd grow><span class="clamp">{$vibe}</span></Lcd>
-          <HardwareButton on:click={() => editor.set('music')}>EDIT…</HardwareButton>
+          <div class="edit-line">
+            <HardwareButton on:click={() => editor.set('music')}>EDIT…</HardwareButton>
+          </div>
         </div>
       </InsetPanel>
 
       <InsetPanel label="SHOW FORMAT">
-        <div class="edit-row bottom">
-          <Lcd grow>
+        <div class="summary">
+          <Lcd>
             <span class="clamp two">{$persona}</span>
             <span class="dim">{presetLabel} · TALK: {$talkLevel} · ERA NEWS: {$eraNews ? 'ON' : 'OFF'}</span><br />
             <span class="dim">VOICE: {$premiumVoice ? 'ELEVENLABS · "VESLA"' : 'LOCAL · "PIPER NB"'}</span>
           </Lcd>
-          <HardwareButton on:click={() => editor.set('format')}>EDIT…</HardwareButton>
+          <div class="edit-line">
+            <HardwareButton on:click={() => editor.set('format')}>EDIT…</HardwareButton>
+          </div>
         </div>
       </InsetPanel>
     </div>
@@ -73,8 +78,17 @@
           {#each TAPES as t}
             <HardwareButton active={$tape === t.id} on:click={() => tape.set(t.id)}>{t.id}</HardwareButton>
           {/each}
+          <HardwareButton
+            active={$tape === 'CUSTOM'}
+            on:click={() => {
+              tape.set('CUSTOM');
+              editor.set('tape');
+            }}
+          >
+            CUSTOM
+          </HardwareButton>
         </div>
-        <div class="readout"><Lcd size="md" center>{selected.perSide} PER SIDE</Lcd></div>
+        <div class="readout"><Lcd size="md" center>{$tapeInfo.label} · {$tapeInfo.perSide} PER SIDE</Lcd></div>
       </InsetPanel>
     </div>
   </div>
@@ -82,7 +96,7 @@
   <TransportStrip>
     <svelte:fragment slot="status">
       <Lcd size="lg">
-        READY · {selected.id} · 2 × {selected.perSide} · EST. {selected.est} TRACKS + HOST LINKS<br />
+        READY · {$tapeInfo.label} · 2 × {$tapeInfo.perSide} · EST. {$tapeInfo.est} TRACKS + HOST LINKS<br />
         <span class="dim">YOUR FILES · YOUR KEYS · YOUR TAPE</span>
       </Lcd>
     </svelte:fragment>
@@ -144,6 +158,25 @@
   </ModalWindow>
 {/if}
 
+{#if $editor === 'tape'}
+  <ModalWindow label="CUSTOM TAPE LENGTH" width={460} on:close={() => editor.set(null)}>
+    <div class="hint-line">TOTAL TAPE LENGTH — BOTH SIDES COMBINED (10–240 MIN)</div>
+    <div class="stepper">
+      <HardwareButton on:click={() => customMinutes.update((m) => Math.max(10, m - 5))}>−5</HardwareButton>
+      <HardwareButton on:click={() => customMinutes.update((m) => Math.max(10, m - 1))}>−1</HardwareButton>
+      <div class="min-well">
+        <input type="number" min="10" max="240" bind:value={$customMinutes} aria-label="Total minutes" />
+        <span class="unit">MIN</span>
+      </div>
+      <HardwareButton on:click={() => customMinutes.update((m) => Math.min(240, m + 1))}>+1</HardwareButton>
+      <HardwareButton on:click={() => customMinutes.update((m) => Math.min(240, m + 5))}>+5</HardwareButton>
+    </div>
+    <div class="readout">
+      <Lcd size="md" center>{$tapeInfo.label} · 2 × {$tapeInfo.perSide} PER SIDE · EST. {$tapeInfo.est} TRACKS</Lcd>
+    </div>
+  </ModalWindow>
+{/if}
+
 <style>
   .main {
     display: grid;
@@ -169,13 +202,17 @@
     gap: 10px;
     align-items: center;
   }
-  .edit-row.grow {
-    flex: 1;
-    align-items: stretch;
+  .summary {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  .edit-row.grow :global(button),
-  .edit-row.bottom :global(button) {
-    align-self: flex-end;
+  .summary.grow {
+    flex: 1;
+  }
+  .edit-line {
+    display: flex;
+    justify-content: flex-end;
   }
   .clamp {
     display: -webkit-box;
@@ -283,5 +320,43 @@
     padding-top: 12px;
     border-top: var(--chrome-divider);
     box-shadow: var(--chrome-divider-glow);
+  }
+  .stepper {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .min-well {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--lcd-bg);
+    border-radius: 6px;
+    box-shadow: var(--lcd-shadow);
+    padding: 4px 14px;
+  }
+  .min-well input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font: 28px var(--font-lcd);
+    color: var(--lcd-fg);
+    text-shadow: 0 0 8px var(--lcd-glow);
+    caret-color: var(--lcd-fg);
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .min-well input::-webkit-outer-spin-button,
+  .min-well input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .unit {
+    font: 16px var(--font-lcd);
+    color: var(--lcd-fg-dim);
   }
 </style>

@@ -22,7 +22,7 @@ This plan translates the Claude Design handoff (`project/NORDTONE MD-90.html`, s
 
 1. **Point** at a music folder → the app indexes it (tags, durations, basic audio features).
 2. **Describe tonight's music** — free text, as simple or as detailed as the user likes, e.g. *"80s synth-pop, upbeat, a little melancholy."* Experienced prompters can write full instructions here; it goes to the LLM verbatim.
-3. **Pick a tape length** — C60 / C90 / C120 (2 × 30 / 45 / 60 min sides).
+3. **Pick a tape length** — C60 / C90 / C120 (2 × 30 / 45 / 60 min sides), or CUSTOM: a popup where the user sets the total tape length themselves (10–240 min, e.g. a real C74).
 4. **Choose a host voice** — a free local voice by default, or a premium ElevenLabs voice.
 5. **Compose** (the red REC button):
    - The user's chosen LLM **selects and sequences** tracks from the library to match the vibe and fit each side.

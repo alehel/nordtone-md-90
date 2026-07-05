@@ -5,7 +5,7 @@
   import Lcd from '../design-system/components/Lcd.svelte';
   import HardwareButton from '../design-system/components/HardwareButton.svelte';
   import JCard from '../design-system/components/JCard.svelte';
-  import { newShow, openSettings } from '../lib/store';
+  import { newShow, openSettings, tapeInfo } from '../lib/store';
   import { SIDE_A, SIDE_B, FIT_REPORT } from '../lib/mock';
 </script>
 
@@ -14,7 +14,13 @@
 
   <div class="main">
     <div class="tray">
-      <JCard sideA={SIDE_A} sideB={SIDE_B} durA={FIT_REPORT.sideA.dur} durB={FIT_REPORT.sideB.dur} />
+      <JCard
+        sideA={SIDE_A}
+        sideB={SIDE_B}
+        durA={FIT_REPORT.sideA.dur}
+        durB={FIT_REPORT.sideB.dur}
+        tapeLabel={$tapeInfo.label}
+      />
     </div>
 
     <div class="col">
