@@ -1,0 +1,84 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--app-bg);
+  font-family: var(--font-ui);
+  color: var(--text-body);
+}
+
+#app {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: auto;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Shared conventional form fields */
+.input,
+textarea.input {
+  font: 400 15px/1.5 var(--font-ui);
+  color: var(--text-hi);
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  outline: none;
+  resize: none;
+}
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+.input::placeholder {
+  color: var(--text-dim);
+}
+
+@keyframes blink {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  70%,
+  100% {
+    opacity: 0.25;
+  }
+}
+@keyframes caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes reelspin {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

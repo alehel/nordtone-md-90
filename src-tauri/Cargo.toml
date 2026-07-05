@@ -1,0 +1,18 @@
+[package]
+name = "nordtone-md-90"
+version = "0.1.0"
+description = "NORDTONE MD-90 — turn your music library into a DJ-hosted radio show, fitted to a cassette."
+edition = "2021"
+license = "MIT"
+
+[lib]
+name = "nordtone_md_90_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

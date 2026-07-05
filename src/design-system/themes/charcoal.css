@@ -1,0 +1,66 @@
+/*
+ * Theme: charcoal (default) — "quiet studio app" (IMPLEMENTATION_PLAN §3.5).
+ * Conventional flat UI carrying the charcoal/amber brand palette.
+ */
+:root[data-theme='charcoal'] {
+  --app-bg: #0b0c0e;
+
+  --window-bg: #1a1b1e;
+  --window-border: rgba(255, 255, 255, 0.07);
+  --card-bg: #212226;
+  --card-border: rgba(255, 255, 255, 0.06);
+  --field-bg: #141518;
+  --field-border: rgba(255, 255, 255, 0.1);
+  --overlay-bg: #1f2023;
+
+  --text-hi: #e8e4da;
+  --text-body: #c9ccd2;
+  --text-mut: #9aa0a8;
+  --text-dim: #84888f;
+
+  --accent: #ffab40;
+  --accent-grad: linear-gradient(180deg, #ffc36b, #f09a2e);
+  --accent-fg: #181004;
+  --accent-soft-bg: rgba(255, 171, 64, 0.08);
+  --accent-soft-border: rgba(255, 171, 64, 0.22);
+  --accent-soft-fg: #c8a06a;
+  --focus-ring: rgba(255, 171, 64, 0.18);
+
+  --btn-bg: #33353a;
+  --btn-bg-hover: #3b3e44;
+  --btn-border: rgba(255, 255, 255, 0.1);
+  --selected-bg: #3a3226;
+  --selected-fg: #ffd9a0;
+  --selected-border: rgba(255, 171, 64, 0.25);
+
+  --dot-ok: radial-gradient(circle at 35% 30%, #9dffb8, #2ea052);
+  --dot-busy: radial-gradient(circle at 35% 30%, #ffd9a0, #e08a1e);
+  --dot-off: #3a3c40;
+  --ok-text: #5f9c74;
+
+  --progress-track: #141518;
+  --progress-fill: linear-gradient(90deg, #8a5a1c, #ffab40);
+
+  /* Flat cassette illustration */
+  --cas-shell: #26272b;
+  --cas-shell-border: rgba(255, 255, 255, 0.08);
+  --cas-label: #efe9d9;
+  --cas-strip: #f0a63c;
+  --cas-strip-ink: #3a2708;
+  --cas-ink: #3b342a;
+  --cas-window: #101113;
+  --cas-reel: repeating-conic-gradient(#d8d4ca 0deg 26deg, #17181a 26deg 60deg);
+  --cas-reel-ring: #241d16;
+
+  /* Paper goods (printed J-card) — unchanged artifact aesthetic */
+  --paper: #faf6ec;
+  --paper-mid: #f3edde;
+  --paper-ink: #3b342a;
+  --paper-ink-soft: #4a4336;
+  --paper-mut: #8a7d5e;
+  --paper-rule: #b9ae94;
+  --jcard-art: linear-gradient(160deg, #20242e 0%, #2b3346 55%, #4a3a58 100%);
+  --jcard-art-fg: #f0e7d2;
+  --lcd-fg: #ffb14e; /* J-card front accent text */
+  --accent-glow: rgba(255, 171, 64, 0.8); /* J-card accent line */
+}

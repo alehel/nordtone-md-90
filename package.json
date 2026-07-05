@@ -1,0 +1,29 @@
+{
+  "name": "nordtone-md-90",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "NORDTONE MD-90 — turn your music library into a DJ-hosted radio show, fitted to a cassette.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@fontsource/barlow": "^5.1.0",
+    "@fontsource/barlow-condensed": "^5.1.0",
+    "@fontsource/vt323": "^5.1.0",
+    "@tauri-apps/api": "^2.2.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@tauri-apps/cli": "^2.2.0",
+    "svelte": "^4.2.19",
+    "svelte-check": "^3.8.6",
+    "tslib": "^2.8.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
