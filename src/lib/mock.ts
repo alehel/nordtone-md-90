@@ -25,6 +25,22 @@ export type HostPresetId = (typeof HOST_PRESETS)[number]['id'];
 export const TALK_LEVELS = ['MINIMAL', 'BALANCED', 'CHATTY'] as const;
 export type TalkLevel = (typeof TALK_LEVELS)[number];
 
+/** Voice lists are engine-specific (IMPLEMENTATION_PLAN §3.5): LOCAL = Piper
+ * voice models installed via Settings; ELEVENLABS = voices fetched from the
+ * user's account. Mocked until Phase 4. */
+export const VOICES = {
+  local: [
+    { id: 'nora', label: '"NORA" · CLEAR & CLOSE' },
+    { id: 'finn', label: '"FINN" · SOFT BARITONE' },
+    { id: 'eir', label: '"EIR" · BRIGHT MORNING' },
+  ],
+  elevenlabs: [
+    { id: 'vesla', label: '"VESLA" · WARM FM' },
+    { id: 'bjorn', label: '"BJØRN" · DEEP LATE-NIGHT' },
+    { id: 'liv', label: '"LIV" · CRISP TOP-40' },
+  ],
+} as const;
+
 export const MONTHS = [
   'JANUARY',
   'FEBRUARY',

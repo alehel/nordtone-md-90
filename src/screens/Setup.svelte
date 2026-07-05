@@ -19,6 +19,8 @@
     hostPreset,
     persona,
     talkLevel,
+    currentVoice,
+    stepVoice,
     clockSet,
     clockYear,
     clockMonth,
@@ -36,6 +38,15 @@
     hostPreset.set(null);
   }
   $: presetLabel = HOST_PRESETS.find((p) => p.id === $hostPreset)?.label ?? 'CUSTOM HOST';
+
+  // Mock voice preview: Phase 4 replaces the timer with real TTS playback.
+  let previewing = false;
+  let previewTimer: ReturnType<typeof setTimeout>;
+  function previewVoice() {
+    clearTimeout(previewTimer);
+    previewing = true;
+    previewTimer = setTimeout(() => (previewing = false), 1600);
+  }
 
   // Month steps cycle: year-only -> JAN ... DEC -> year-only.
   function stepMonth(dir: 1 | -1) {
@@ -74,9 +85,7 @@
             <span class="clamp two">{$persona}</span>
             <span class="dim">{presetLabel} · TALK: {$talkLevel}</span><br />
             <span class="dim">
-              VOICE: {$premiumVoice ? 'ELEVENLABS · "VESLA"' : 'LOCAL · "PIPER NB"'}{$clockSet
-                ? ` · CLOCK: ${$clockLabel}`
-                : ''}
+              VOICE: {$currentVoice.engine} · {$currentVoice.label}{$clockSet ? ` · CLOCK: ${$clockLabel}` : ''}
             </span>
           </Lcd>
           <div class="edit-line">
@@ -164,7 +173,18 @@
         <div class="field-label">HOST VOICE</div>
         <ToggleSwitch bind:value={$premiumVoice} />
       </div>
-      <Lcd size="md" grow center>{$premiumVoice ? '"VESLA" · WARM FM' : 'LOCAL · "PIPER NB"'}</Lcd>
+      <div class="voice-tuner">
+        <HardwareButton on:click={() => stepVoice(-1)}>◂</HardwareButton>
+        <Lcd size="md" grow center>
+          {#if previewing}
+            <span>PREVIEWING…</span><span class="cursor-block"></span>
+          {:else}
+            {$currentVoice.label} <span class="dim">· {$currentVoice.pos}/{$currentVoice.count}</span>
+          {/if}
+        </Lcd>
+        <HardwareButton on:click={() => stepVoice(1)}>▸</HardwareButton>
+        <HardwareButton active={previewing} on:click={previewVoice}>▶ PREVIEW</HardwareButton>
+      </div>
     </div>
     <div class="voice-row">
       <div>
@@ -362,6 +382,25 @@
   }
   .clock-ctl :global(button) {
     padding: 7px 12px;
+  }
+  .voice-tuner {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .voice-tuner :global(button) {
+    padding: 7px 12px;
+  }
+  .cursor-block {
+    display: inline-block;
+    width: 9px;
+    height: 0.9em;
+    background: var(--lcd-fg);
+    vertical-align: -0.1em;
+    margin-left: 4px;
+    animation: cursor 1.1s steps(1) infinite;
+    box-shadow: 0 0 8px var(--lcd-glow);
   }
   .min-well {
     flex: 1;

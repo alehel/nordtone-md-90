@@ -148,7 +148,9 @@ TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*.
 **Editor windows instead of inline panels.** TONIGHT'S MUSIC and SHOW FORMAT appear on the main faceplate as compact **summary panels** — an LCD readout of what's currently chosen plus an EDIT key — and editing happens in a **modal hardware module** (`ModalWindow`) over the dimmed faceplate. Two reasons:
 
 - The main view stays stable: controls can be added, removed, or reorganized inside an editor without rebalancing the faceplate layout every time.
-- Editor contents can be **dynamic**: options adapt to context — the SHOW FORMAT editor already holds the host-voice engine toggle (LOCAL/ELEVENLABS) alongside the persona controls, so engine-specific voice options (ElevenLabs voice picker and style settings vs. local Piper voice-model list) appear right there when Phase 4 lands, and future provider-specific knobs follow the same pattern without touching the main screen.
+- Editor contents can be **dynamic**: options adapt to context — the SHOW FORMAT editor already holds the host-voice engine toggle (LOCAL/ELEVENLABS) alongside the persona controls, so engine-specific voice options appear right there, and future provider-specific knobs follow the same pattern without touching the main screen.
+
+**Voice selection & preview.** The HOST VOICE row in the SHOW FORMAT editor is a tuner: engine toggle (LOCAL/ELEVENLABS), ◂ ▸ keys stepping through the current engine's voices on an LCD readout, and a **▶ PREVIEW** key. Selection is remembered per engine. The voice *lists* are engine-specific and populated in Phase 4: LOCAL shows the Piper voice models installed on the machine (models are downloaded/managed in **Settings → local voice management**); ELEVENLABS shows the voices fetched from the user's own account via their API key (including their cloned/custom voices). PREVIEW renders one short sample line in the selected voice — spoken in the current host persona so the user hears the actual show host, not a generic demo — cached per voice+persona so repeat previews are instant and (for ElevenLabs) don't re-bill.
 
 **CUSTOM tape length.** Alongside C60/C90/C120, a fourth CUSTOM key opens a popup where the user sets the total tape length themselves (10–240 min, both sides combined — e.g. a real C74). The custom length flows through everything a preset would: per-side readout, track estimate, tape counter, and the J-card label.
 
@@ -282,9 +284,10 @@ Each phase is independently demoable. **MVP milestone = end of Phase 5.**
 - **Demo:** vibe prompt → a real, fitted tracklist + a live-written DJ script.
 
 ### Phase 4 — Text-to-speech
-- Bundle **Piper** + a default warm voice ("VESLA" persona) as the free local option; run as a sidecar, render script segments to audio.
-- ElevenLabs HTTP path behind the toggle (key in keychain); voice preview button.
-- **Demo:** the written script is spoken; toggle switches voice engines.
+- Bundle **Piper** + a default warm voice as the free local option; run as a sidecar, render script segments to audio. Additional Piper voice models downloadable/managed in Settings.
+- ElevenLabs HTTP path behind the toggle (key in keychain); voice list fetched from the user's account.
+- Wire the §3.5 voice tuner for real: engine-specific voice lists, ▶ PREVIEW renders a short persona sample in the selected voice (cached per voice+persona).
+- **Demo:** the written script is spoken; toggle switches voice engines; stepping voices + preview works on both engines.
 
 ### Phase 5 — Audio mix engine  ⟶ **MVP**
 - Implement §5 in stages: 5a decode+normalize+concat+WAV; 5b crossfades; 5c ducking; 5d fit-to-side solver.

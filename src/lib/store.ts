@@ -9,6 +9,7 @@ import {
   NOW_FITTING,
   HOST_PRESETS,
   MONTHS,
+  VOICES,
   type TapeId,
   type HostPresetId,
   type TalkLevel,
@@ -66,6 +67,26 @@ export const tapeInfo = derived([tape, customMinutes], ([t, mins]) => {
 export const hostPreset = writable<HostPresetId | null>('warm');
 export const persona = writable<string>(HOST_PRESETS[0].persona);
 export const talkLevel = writable<TalkLevel>('BALANCED');
+
+/* HOST VOICE — selection is remembered per engine, so toggling engines
+   doesn't lose your pick. Voice lists are engine-specific (§3.5). */
+export const localVoiceIdx = writable<number>(0);
+export const elevenVoiceIdx = writable<number>(0);
+
+export const currentVoice = derived(
+  [premiumVoice, localVoiceIdx, elevenVoiceIdx],
+  ([premium, li, ei]) => {
+    const list = premium ? VOICES.elevenlabs : VOICES.local;
+    const idx = ((premium ? ei : li) % list.length + list.length) % list.length;
+    return { ...list[idx], engine: premium ? 'ELEVENLABS' : 'LOCAL', pos: idx + 1, count: list.length };
+  },
+);
+
+export function stepVoice(dir: 1 | -1): void {
+  const target = get(premiumVoice) ? elevenVoiceIdx : localVoiceIdx;
+  const len = get(premiumVoice) ? VOICES.elevenlabs.length : VOICES.local.length;
+  target.update((i) => (i + dir + len) % len);
+}
 
 /** Which editor window is open on the Setup faceplate. */
 export const editor = writable<'music' | 'format' | 'tape' | null>(null);
