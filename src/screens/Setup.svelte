@@ -9,6 +9,7 @@
   import CassetteBay from '../design-system/components/CassetteBay.svelte';
   import TransportStrip from '../design-system/components/TransportStrip.svelte';
   import RoundButton from '../design-system/components/RoundButton.svelte';
+  import ModalWindow from '../design-system/components/ModalWindow.svelte';
   import {
     vibe,
     tape,
@@ -17,6 +18,7 @@
     persona,
     talkLevel,
     eraNews,
+    editor,
     applyHostPreset,
     startCompose,
     openSettings,
@@ -29,69 +31,43 @@
   $: if ($hostPreset && $persona !== HOST_PRESETS.find((p) => p.id === $hostPreset)?.persona) {
     hostPreset.set(null);
   }
+  $: presetLabel = HOST_PRESETS.find((p) => p.id === $hostPreset)?.label ?? 'CUSTOM HOST';
 </script>
 
 <Panel>
   <AppChrome led="ok" ledLabel="PWR" onSettings={openSettings} />
 
   <div class="main">
-    <div class="row1">
-      <div class="col">
-        <InsetPanel label="SOURCE LIBRARY">
-          <div slot="right" class="pill"><Led state="ok" /><span>INDEXED</span></div>
-          <div class="src-row">
-            <Lcd grow>{LIBRARY.path} — {LIBRARY.tracks.toLocaleString('en-US')} tracks · {LIBRARY.size}</Lcd>
-            <HardwareButton>BROWSE…</HardwareButton>
-          </div>
-        </InsetPanel>
-
-        <InsetPanel label="TONIGHT'S MUSIC" grow>
-          <div slot="right" class="hint">IN YOUR OWN WORDS — SIMPLE OR DETAILED</div>
-          <div class="vibe-well">
-            <textarea bind:value={$vibe} spellcheck="false" aria-label="Tonight's music"></textarea>
-          </div>
-          <div class="chips">
-            {#each VIBE_CHIPS as chip}
-              <button class="chip" on:click={() => vibe.update((v) => (v ? v + ' · ' + chip : chip))}>{chip}</button>
-            {/each}
-          </div>
-        </InsetPanel>
-      </div>
-
-      <CassetteBay title={SHOW_TITLE} spinning={false} />
-    </div>
-
-    <div class="row2">
-      <InsetPanel label="SHOW FORMAT">
-        <div slot="right" class="hint">THE HOST — PRESS A PRESET OR WRITE YOUR OWN</div>
-        <div class="field-label">HOST PERSONALITY</div>
-        <div class="presets">
-          {#each HOST_PRESETS as p}
-            <HardwareButton active={$hostPreset === p.id} on:click={() => applyHostPreset(p.id)}>
-              {p.label}
-            </HardwareButton>
-          {/each}
-        </div>
-        <div class="persona-well">
-          <textarea bind:value={$persona} spellcheck="false" aria-label="Host persona"></textarea>
-        </div>
-        <div class="format-row">
-          <div>
-            <div class="field-label">TALK AMOUNT</div>
-            <div class="talk">
-              {#each TALK_LEVELS as lvl}
-                <HardwareButton active={$talkLevel === lvl} on:click={() => talkLevel.set(lvl)}>{lvl}</HardwareButton>
-              {/each}
-            </div>
-          </div>
-          <div>
-            <div class="field-label">ERA NEWS</div>
-            <ToggleSwitch left="OFF" right="ON" bind:value={$eraNews} />
-          </div>
+    <div class="col">
+      <InsetPanel label="SOURCE LIBRARY">
+        <div slot="right" class="pill"><Led state="ok" /><span>INDEXED</span></div>
+        <div class="edit-row">
+          <Lcd grow>{LIBRARY.path} — {LIBRARY.tracks.toLocaleString('en-US')} tracks · {LIBRARY.size}</Lcd>
+          <HardwareButton>BROWSE…</HardwareButton>
         </div>
       </InsetPanel>
 
-      <div class="col">
+      <InsetPanel label="TONIGHT'S MUSIC" grow>
+        <div class="edit-row grow">
+          <Lcd grow><span class="clamp">{$vibe}</span></Lcd>
+          <HardwareButton on:click={() => editor.set('music')}>EDIT…</HardwareButton>
+        </div>
+      </InsetPanel>
+
+      <InsetPanel label="SHOW FORMAT">
+        <div class="edit-row">
+          <Lcd grow>
+            <span class="clamp two">{$persona}</span>
+            <span class="dim">{presetLabel} · TALK: {$talkLevel} · ERA NEWS: {$eraNews ? 'ON' : 'OFF'}</span>
+          </Lcd>
+          <HardwareButton on:click={() => editor.set('format')}>EDIT…</HardwareButton>
+        </div>
+      </InsetPanel>
+    </div>
+
+    <div class="col">
+      <CassetteBay title={SHOW_TITLE} spinning={false} />
+      <div class="pair">
         <InsetPanel label="TAPE LENGTH">
           <div class="tapes">
             {#each TAPES as t}
@@ -124,20 +100,56 @@
   </TransportStrip>
 </Panel>
 
+{#if $editor === 'music'}
+  <ModalWindow label="TONIGHT'S MUSIC" on:close={() => editor.set(null)}>
+    <div class="hint-line">IN YOUR OWN WORDS — AS SIMPLE OR AS DETAILED AS YOU LIKE. IT GOES TO YOUR AI VERBATIM.</div>
+    <div class="lcd-well tall">
+      <textarea bind:value={$vibe} spellcheck="false" aria-label="Tonight's music"></textarea>
+    </div>
+    <div class="chips">
+      {#each VIBE_CHIPS as chip}
+        <button class="chip" on:click={() => vibe.update((v) => (v ? v + ' · ' + chip : chip))}>{chip}</button>
+      {/each}
+    </div>
+  </ModalWindow>
+{/if}
+
+{#if $editor === 'format'}
+  <ModalWindow label="SHOW FORMAT" on:close={() => editor.set(null)}>
+    <div class="field-label">HOST PERSONALITY — PRESS A PRESET OR WRITE YOUR OWN</div>
+    <div class="presets">
+      {#each HOST_PRESETS as p}
+        <HardwareButton active={$hostPreset === p.id} on:click={() => applyHostPreset(p.id)}>
+          {p.label}
+        </HardwareButton>
+      {/each}
+    </div>
+    <div class="lcd-well">
+      <textarea bind:value={$persona} spellcheck="false" aria-label="Host persona"></textarea>
+    </div>
+    <div class="format-row">
+      <div>
+        <div class="field-label">TALK AMOUNT</div>
+        <div class="talk">
+          {#each TALK_LEVELS as lvl}
+            <HardwareButton active={$talkLevel === lvl} on:click={() => talkLevel.set(lvl)}>{lvl}</HardwareButton>
+          {/each}
+        </div>
+      </div>
+      <div>
+        <div class="field-label">ERA NEWS</div>
+        <ToggleSwitch left="OFF" right="ON" bind:value={$eraNews} />
+      </div>
+    </div>
+  </ModalWindow>
+{/if}
+
 <style>
   .main {
-    padding: 22px 34px 0;
-  }
-  .row1 {
     display: grid;
     grid-template-columns: 1fr 470px;
     gap: 22px;
-  }
-  .row2 {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 22px;
-    margin-top: 18px;
+    padding: 22px 34px 0;
   }
   .col {
     display: flex;
@@ -152,35 +164,78 @@
     letter-spacing: 1.5px;
     color: var(--text-mut3);
   }
-  .hint {
-    font: 500 10px var(--font-label);
-    letter-spacing: 1.5px;
-    color: var(--text-mut3);
-  }
-  .src-row {
+  .edit-row {
     display: flex;
     gap: 10px;
     align-items: center;
   }
-  .src-row :global(.lcd) {
-    white-space: nowrap;
-  }
-  .vibe-well {
+  .edit-row.grow {
     flex: 1;
+    align-items: stretch;
+  }
+  .edit-row.grow :global(button) {
+    align-self: center;
+  }
+  .clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .clamp.two {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .tapes {
     display: flex;
-    min-height: 112px;
+    gap: 8px;
+  }
+  .tapes :global(button) {
+    flex: 1;
+    padding: 9px 0;
+    text-align: center;
+  }
+  .readout {
+    margin-top: 10px;
+  }
+
+  /* Editor-window internals */
+  .hint-line {
+    font: 500 10px var(--font-label);
+    letter-spacing: 1.5px;
+    color: var(--text-mut3);
+    margin-bottom: 10px;
+  }
+  .field-label {
+    font: 600 10px var(--font-label);
+    letter-spacing: 2px;
+    color: var(--text-mut3);
+    margin-bottom: 6px;
+  }
+  .lcd-well {
+    display: flex;
+    min-height: 110px;
     background: var(--lcd-bg);
     border-radius: 6px;
     box-shadow: var(--lcd-shadow);
-    padding: 12px 14px;
+    padding: 10px 12px;
   }
-  textarea {
+  .lcd-well.tall {
+    min-height: 170px;
+  }
+  .lcd-well textarea {
     flex: 1;
     background: transparent;
     border: none;
     outline: none;
     resize: none;
-    font: 19px/1.45 var(--font-lcd);
+    font: 18px/1.45 var(--font-lcd);
     color: var(--lcd-fg);
     text-shadow: 0 0 8px var(--lcd-glow);
     caret-color: var(--lcd-fg);
@@ -199,40 +254,15 @@
     padding: 2px 12px;
     cursor: pointer;
   }
-  .field-label {
-    font: 600 10px var(--font-label);
-    letter-spacing: 2px;
-    color: var(--text-mut3);
-    margin-bottom: 6px;
-  }
   .presets {
     display: flex;
-    gap: 8px;
     flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
   }
   .presets :global(button) {
     padding: 7px 10px;
     font-size: 12px;
-  }
-  .persona-well {
-    display: flex;
-    min-height: 100px;
-    margin-top: 10px;
-    background: var(--lcd-bg);
-    border-radius: 6px;
-    box-shadow: var(--lcd-shadow);
-    padding: 9px 12px;
-  }
-  .persona-well textarea {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    resize: none;
-    font: 17px/1.45 var(--font-lcd);
-    color: var(--lcd-fg);
-    text-shadow: 0 0 8px var(--lcd-glow);
-    caret-color: var(--lcd-fg);
   }
   .format-row {
     display: flex;
@@ -241,9 +271,6 @@
     gap: 18px;
     margin-top: 12px;
   }
-  .format-row > div:last-child {
-    padding-bottom: 2px;
-  }
   .talk {
     display: flex;
     gap: 8px;
@@ -251,17 +278,5 @@
   .talk :global(button) {
     padding: 7px 10px;
     font-size: 12px;
-  }
-  .tapes {
-    display: flex;
-    gap: 8px;
-  }
-  .tapes :global(button) {
-    flex: 1;
-    padding: 9px 0;
-    text-align: center;
-  }
-  .readout {
-    margin-top: 10px;
   }
 </style>

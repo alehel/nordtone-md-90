@@ -40,6 +40,9 @@ export const persona = writable<string>(HOST_PRESETS[0].persona);
 export const talkLevel = writable<TalkLevel>('BALANCED');
 export const eraNews = writable<boolean>(true);
 
+/** Which editor window is open on the Setup faceplate. */
+export const editor = writable<'music' | 'format' | null>(null);
+
 export function applyHostPreset(id: HostPresetId): void {
   hostPreset.set(id);
   persona.set(HOST_PRESETS.find((p) => p.id === id)?.persona ?? '');

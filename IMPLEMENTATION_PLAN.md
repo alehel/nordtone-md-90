@@ -92,12 +92,13 @@ Rebuild the prototype as these primitives (framework-agnostic names):
 - `CassetteBay` — the cassette graphic: label header, title, reel window with two conic-gradient reels (spin when active), shell screws.
 - `StageList` — the PROGRESS SEQUENCE rows (LED + label + VT323 status) for the five generation stages.
 - `TransportStrip` — bottom bar: status LCD + primary action button (REC / STOP / PRINT). *(The design's VU meters were dropped — see §3.5.)*
-- `ShowFormat` — the granular show-definition controls (§3.5): host-personality preset keys with a persona LCD readout, talk-amount selector, era-news toggle.
+- `ModalWindow` — a smaller hardware module overlaying the dimmed faceplate: label header, × close key, DONE key. Hosts the editor windows (§3.5).
+- `ShowFormat` — the granular show-definition controls (§3.5): host-personality preset keys with a persona LCD readout, talk-amount selector, era-news toggle. Lives inside an editor window.
 - `JCard` — the unfolded, print-scaled inlay (front art panel, dashed fold + spine, two-column tracklist flap, credits). The mockup's credit line ("SCRIPT BY CLAUDE") is rendered dynamically from the configured provider/model — e.g. "SCRIPT BY GPT-4O" or "SCRIPT BY LLAMA 3 (LOCAL)".
 
 ### 3.3 Screens
 
-1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S MUSIC editor (free-text LCD textarea + suggested genre chips), **SHOW FORMAT panel** (host-personality presets, talk amount, era news — §3.5), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
+1. **Setup** (`1a`) — SOURCE LIBRARY slot (path + track count/size + BROWSE + INDEXED led), TONIGHT'S MUSIC and SHOW FORMAT **summary panels** (LCD summary of the current choices + EDIT key, opening editor windows — §3.5), CASSETTE BAY, TAPE LENGTH segmented control + "45:00 PER SIDE" readout, HOST VOICE toggle + selected-voice readout, transport strip with **REC · COMPOSE SHOW**.
 2. **Generation** (`1b`) — PROGRAM SEQUENCE stage LEDs (Scan → Select → Write Script → Voice → Mix), SCRIPT MONITOR (streams the DJ script live), spinning CASSETTE BAY, TAPE COUNTER (`00:17:26 / 45:00` + progress bar), transport strip with **STOP · CANCEL** and a "now fitting / duck / crossfade" status line.
 3. **J-card** (`1c`) — the unfolded inlay in a paper tray, OUTPUT list (`side-a.wav`, `side-b.wav`, `jcard.pdf`), **PRINT J-CARD / EXPORT PDF / REVEAL AUDIO FILES**, and a FIT REPORT (side slack, LUFS, ducking events).
 4. **Settings** (new — flagged in the transcript as the likely next screen) — **AI provider picker** (provider + model + API key, or Ollama/custom endpoint URL for local models) and ElevenLabs key, all secrets stored in the OS keychain; local voice model management; default tape length; output folder; loudness target; **FACEPLATE theme selector** (§3.4). Styled to match (inset panels + LCD fields).
@@ -141,6 +142,11 @@ Two changes were decided after the handoff and supersede the mockups:
 - **ERA NEWS** — on/off toggle for the "news items from the era of the music" segments.
 
 TONIGHT'S MUSIC describes the *music*; SHOW FORMAT shapes the *host and script*. Both are merged by the prompt builder, so a novice gets a great show having typed nothing but a genre, while a prompter can write exactly what they want in either field.
+
+**Editor windows instead of inline panels.** TONIGHT'S MUSIC and SHOW FORMAT appear on the main faceplate as compact **summary panels** — an LCD readout of what's currently chosen plus an EDIT key — and editing happens in a **modal hardware module** (`ModalWindow`) over the dimmed faceplate. Two reasons:
+
+- The main view stays stable: controls can be added, removed, or reorganized inside an editor without rebalancing the faceplate layout every time.
+- Editor contents can be **dynamic**: options adapt to context — e.g. the host editor can surface engine-specific voice controls depending on the chosen TTS service (ElevenLabs voice picker and style settings vs. local Piper voice-model list), and future provider-specific knobs follow the same pattern without touching the main screen.
 
 ---
 
